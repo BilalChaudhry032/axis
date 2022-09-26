@@ -1,0 +1,73 @@
+<?php
+
+use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WorkOrderController;
+use App\Http\Controllers\VendorController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\BillingAddressController;
+use App\Http\Controllers\PartsController;
+use App\Http\Middleware\AuthMiddleware;
+use Illuminate\Support\Facades\Auth;
+
+
+Route::get('/login', [AuthController::class, 'index'])->name('login');
+Route::post('/validate-login', [AuthController::class, 'validateLogin']);
+
+Route::middleware([AuthMiddleware::class])->group(function () {
+
+    Route::get('/logout', [AuthController::class, 'logout']);
+
+    Route::get('/', function () {
+        return view('layouts.master');
+    });
+
+    Route::get('/vendor', [VendorController::class, 'index'])->name('vendor');
+    Route::post('/vendor', [VendorController::class, 'store']);
+    Route::put('/vendor/{vendor_id}', [VendorController::class, 'update']);
+    Route::delete('/vendor/{vendor_id}', [VendorController::class, 'destroy']);
+
+    Route::get('/company', [CompanyController::class, 'index'])->name('company');
+    Route::post('/company', [CompanyController::class, 'store']);
+    Route::put('/company/{company_id}', [CompanyController::class, 'update']);
+    Route::delete('/company/{company_id}', [CompanyController::class, 'destroy']);
+
+    Route::get('/billing-address', [BillingAddressController::class, 'index'])->name('billingAddress');
+    Route::post('/billing-address', [BillingAddressController::class, 'store']);
+    Route::put('/billing-address/{billing_address_id}', [BillingAddressController::class, 'update']);
+    Route::delete('/billing-address/{billing_address_id}', [BillingAddressController::class, 'destroy']);
+
+    Route::get('/parts', [PartsController::class, 'index'])->name('parts');
+    Route::post('/parts', [PartsController::class, 'store']);
+    Route::put('/parts/{part_id}', [PartsController::class, 'update']);
+    Route::delete('/parts/{part_id}', [PartsController::class, 'destroy']);
+
+    Route::get('/workorders', [WorkOrderController::class, 'index'])->name('workorders');
+    Route::get('/workorders/workorder/{workorder_id}', [WorkOrderController::class, 'editWorkorder']);
+    Route::put('/workorders/workorder/{workorder_id}', [WorkOrderController::class, 'updateWorkorder']);
+    // Route::get('/workorders/parts/{workorder_id}', [WorkOrderController::class, 'editParts']);
+    Route::put('/workorders/parts/{workorder_id}', [WorkOrderController::class, 'updateParts']);
+
+});
+
+
+Route::get('/users', function () {
+    return view('Users');
+});
+
+Route::get('/archived', function () {
+    return view('Archived');
+});
+
+Route::get('/reports', function () {
+    return view('Reports');
+});
+
+Route::get('/customers', function () {
+    return view('Customers');
+});
+
+Route::get('/payments', function () {
+    return view('Payments');
+});
+
