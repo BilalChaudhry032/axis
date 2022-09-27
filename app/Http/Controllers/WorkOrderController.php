@@ -85,8 +85,9 @@ class WorkOrderController extends Controller
         // WorkOrder Parts
         $wo_parts = WorkorderPart::where('workorder_id', '=', $workOrder->workorder_id)
         ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
-        ->select('workorder_part.wo_part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
+        ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
 
+        $parts_list = Part::select('name', 'part_id')->get();
 // dd($wo_parts);
 
         $workorder_id = (isset($workOrder) ? $workOrder->workorder_id : '');
@@ -155,12 +156,13 @@ class WorkOrderController extends Controller
             'amount_due' => $amount_due,
 
             'workorder_parts' => $workorder_parts,
+            'parts_list' => $parts_list,
 
         ]);
     }
 
     public function updateWorkorder(Request $request) {
-        dd($request);
+        // dd($request);
         
         return redirect()->back()->with('message', 'Workorder updated successfully!');
     }
@@ -169,5 +171,11 @@ class WorkOrderController extends Controller
         dd($request);
 
         return redirect()->back()->with('message', 'Part updated successfully!');
+    }
+
+    public function getProduct() {
+        $part_id = $_GET['part_id'];
+        $part_info = Part::where('part_id', '=', $part_id)->select('unit_price')->get();
+        return response()->json(array('msg'=> $part_info), 200);
     }
 }

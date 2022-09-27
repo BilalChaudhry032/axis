@@ -36,6 +36,15 @@
 
 <body>
 
+   @if($message = Session::get('message'))
+      <div class="alert alert-primary alert-dismissible fade show" role="alert" style="position: fixed; right: 15px; top: 70px; z-index: 9999;">
+         {{ $message }}
+         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+         </button>
+      </div>
+   @endif
+
    <!-- Offcanval Overlay -->
    <div class="offcanvas-overlay"></div>
    <!-- Offcanval Overlay -->
@@ -58,14 +67,6 @@
          <!-- Main Content -->
          <div class="main-content" style="min-height: calc(100vh - 160px); margin-top: 90px;">
             <div class="container-fluid">
-               @if($message = Session::get('message'))
-                  <div class="alert alert-primary alert-dismissible fade show" role="alert" style="position: absolute; right: 15px; top: 0px; z-index: 9999;">
-                     {{ $message }}
-                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                     </button>
-                  </div>
-               @endif
                @yield('content')
             </div>
          </div>

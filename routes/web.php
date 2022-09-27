@@ -48,6 +48,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     // Route::get('/workorders/parts/{workorder_id}', [WorkOrderController::class, 'editParts']);
     Route::put('/workorders/parts/{workorder_id}', [WorkOrderController::class, 'updateParts']);
 
+    Route::get('/get-product', [WorkOrderController::class, 'getProduct']);
+
 });
 
 
