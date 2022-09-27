@@ -88,7 +88,7 @@ class WorkOrderController extends Controller
         ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
 
         $parts_list = Part::select('name', 'part_id')->get();
-// dd($wo_parts);
+// dd($company);
 
         $workorder_id = (isset($workOrder) ? $workOrder->workorder_id : '');
         $date_received = (isset($workOrder) ? Carbon::parse($workOrder->date_received)->format('d-m-Y') : '');
@@ -161,9 +161,41 @@ class WorkOrderController extends Controller
         ]);
     }
 
-    public function updateWorkorder(Request $request) {
+    public function updateWorkorder(Request $request, $workorder_id) {
         // dd($request);
-        
+        // $request->validate([
+        //     'username' => 'required', 
+        //     'password' => 'required',
+        // ]);
+
+        $workOrder = Workorder::where('workorder_id', '=', $workorder_id)->first();
+
+        Workorder::where('workorder_id', '=', $workorder_id)->update([
+            'date_received' => Carbon::parse($request->date_received)->format('Y-m-d'),
+            'po_num' => $request->po_num,
+            'reference_num' => $request->reference_num,
+            'branch' => $request->branch,
+            'country' => $request->country,
+            'serial_num' => $request->serial_num,
+            'problem_desc' => $request->problem_desc,
+            'child_id' => $request->contact_person,
+            'report_name' => $request->report_name,
+            'discount' => $request->discount,
+            'sales_tax_rate' => $request->sales_tax_rate,
+            'financial' => $request->financial,
+            'hardcopy_delivered' => $request->hardcopy_delivered ? 1 : 0,
+            'date_delivered' => Carbon::parse($request->date_delivered)->format('Y-m-d'),
+            
+        ]);
+
+        CustomerParent::where('customer_id', '=', $workOrder->customer_id)->update([
+            'billing_address_id' => $request->billing_address,
+            'company_id' => $request->company,
+            'postal_address' => $request->postal_address,
+            
+        ]);
+
+
         return redirect()->back()->with('message', 'Workorder updated successfully!');
     }
 

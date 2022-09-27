@@ -11,7 +11,9 @@ class CustomerParent extends Model
 
     protected $table = 'customer_parent';
     public $timestamps = false;
-    // protected $fillable = [
-    //     'name'
-    // ];
+    protected $fillable = [
+        'billing_address',
+        'company_id',
+        'postal_address'
+    ];
 }

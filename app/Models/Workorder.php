@@ -11,13 +11,21 @@ class Workorder extends Model
     use HasFactory;
 
     protected $table = 'workorder';
-
-    public function customerParent() {
-        return $this->hasOne(CustomerParent::class);
-    }
-
-    // public function searchWorkOrder($query, array $filters) {
-    //     dd($filters['search']);
-    // }
+    public $timestamps = false;
+    protected $fillable = [
+        'date_received',
+        'po_num',
+        'reference_num',
+        'branch',
+        'country',
+        'serial_num',
+        'problem_desc',
+        'child_id',
+        'report_name',
+        'discount',
+        'sales_tax_rate',
+        'financial',
+        'hardcopy_delivered'
+    ];
 
 }

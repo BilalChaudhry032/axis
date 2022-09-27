@@ -195,7 +195,7 @@
              <span class="input-group-addon">
               <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
              </span>
-             <input type="text" class="simple-date-picker" placeholder="Select Date" name="" value="{{ $date_delivered }}"/>
+             <input type="text" class="simple-date-picker" placeholder="Select Date" name="date_delivered" value="{{ $date_delivered }}"/>
             </div>
             <!-- End Date Picker -->
            </div>
@@ -228,7 +228,7 @@
           
           <div class="form-row mb-2">
            <div class="col-sm-3">
-            <label class="font-14 bold">Company</label>
+            <label class="font-14 bold">Company {{$company_id}}</label>
            </div>
            <div class="col-sm-9">
             <select class="search-select" name="company">
