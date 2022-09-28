@@ -15,7 +15,6 @@ $('#smartwizard').smartWizard({
     enableURLhash: true,
     anchorSettings: {
         enableAllAnchors: true, // Activates all anchors clickable all times
-
         anchorClickable: true, // Enable/Disable anchor navigation
         markDoneStep: false, // Add done state on navigation
         markAllPreviousStepsAsDone: false, // When a step selected by url hash, all previous steps are marked done
@@ -25,6 +24,9 @@ $('#smartwizard').smartWizard({
         toolbarPosition: 'none', // none, top, bottom, both
         showNextButton: false, // show/hide a Next button
         showPreviousButton: false, // show/hide a Previous button
+    },
+    keyboardSettings: {
+        keyNavigation: false, // Enable/Disable keyboard navigation(left and right keys are used if enabled)
     },
 });
 

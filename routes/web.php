@@ -42,18 +42,25 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::put('/parts/{part_id}', [PartsController::class, 'update']);
     Route::delete('/parts/{part_id}', [PartsController::class, 'destroy']);
 
+    // *** Routes for Workorder and related items -Start- ***
     Route::get('/workorders', [WorkOrderController::class, 'index'])->name('workorders');
     Route::get('/workorders/workorder/{workorder_id}', [WorkOrderController::class, 'editWorkorder']);
     Route::put('/workorders/workorder/{workorder_id}', [WorkOrderController::class, 'updateWorkorder']);
     // Route::get('/workorders/parts/{workorder_id}', [WorkOrderController::class, 'editParts']);
 
     // Route::get('/get-workorder-products', [WorkOrderController::class, 'storeParts']);
-    Route::get('/workorders/{workorder_id}/parts', [WorkOrderController::class, 'showParts']);
+    // Route::get('/workorders/{workorder_id}/parts', [WorkOrderController::class, 'showParts']);
+
     Route::post('/workorders/parts', [WorkOrderController::class, 'storeParts']);
     Route::put('/workorders/part/{wo_part_id}', [WorkOrderController::class, 'updateParts']);
     Route::delete('/workorders/part/{wo_part_id}', [WorkOrderController::class, 'destroyParts']);
+    Route::get('/get-product', [WorkOrderController::class, 'getProduct']);//AJAX
 
-    Route::get('/get-product', [WorkOrderController::class, 'getProduct']);
+    Route::post('/workorders/labors', [WorkOrderController::class, 'storeLabors']);
+    Route::put('/workorders/labor/{wo_labor_id}', [WorkOrderController::class, 'updateLabors']);
+    Route::delete('/workorders/labor/{wo_labor_id}', [WorkOrderController::class, 'destroyLabors']);
+
+    // *** Routes for Workorder and related items -End- ***
 
 });
 

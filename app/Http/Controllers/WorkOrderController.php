@@ -12,11 +12,14 @@ use App\Models\Part;
 use App\Models\Payment;
 use App\Models\Vendor;
 use App\Models\Workorder;
+use App\Models\WorkorderLabor;
 use App\Models\WorkorderPart;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\ValidatedData;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\URL;
 
 class WorkOrderController extends Controller
 {
@@ -67,8 +70,6 @@ class WorkOrderController extends Controller
         $company = Company::get();
 
         $vendor = Vendor::get();
-
-        // $payment = Payment::where('workorder_id', '=', $workOrder->workorder_id)->get();
         
         $sql = "select sum(p.quantity*p.unit_price) as sub_total from workorder_part p, part pa where p.workorder_id=$workOrder->workorder_id and p.part_id=pa.part_id";
         $sub_total = DB::select($sql);
@@ -82,13 +83,18 @@ class WorkOrderController extends Controller
 
         // dd($sub_total - $payments);
 
-        // // WorkOrder Parts
-        // $wo_parts = WorkorderPart::where('workorder_id', '=', $workOrder->workorder_id)
-        // ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
-        // ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
+        // WorkOrder Parts
+        $wo_parts = WorkorderPart::where('workorder_id', '=', $workOrder->workorder_id)
+            ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
+            ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
+        $parts_list = Part::select('name', 'part_id')->get();
 
-        // $parts_list = Part::select('name', 'part_id')->get();
-// dd($company);
+        // WorkOrder Labors
+        $wo_labors = WorkorderLabor::where('workorder_id', '=', $workOrder->workorder_id)
+            ->join('employee', 'employee.employee_id', '=', 'workorder_labor.employee_id')
+            ->select('workorder_labor.wo_labor_id', 'workorder_labor.employee_id', 'workorder_labor.billable_hours', 'workorder_labor.hourly_rate', 'workorder_labor.comments', 'employee.first_name', 'employee.last_name')->paginate(10);
+        $employee_list = Employee::select('first_name', 'last_name')->get();
+// dd($wo_labors);
 
         $workorder_id = (isset($workOrder) ? $workOrder->workorder_id : '');
         $date_received = (isset($workOrder) ? Carbon::parse($workOrder->date_received)->format('d-m-Y') : '');
@@ -122,9 +128,11 @@ class WorkOrderController extends Controller
         $payments = ($payments == 0 ? '0.00' : number_format($payments, 2, '.', ','));
         $amount_due = ($amount_due == 0 ? '0.00' : number_format($amount_due, 2, '.', ','));
 
-        // $workorder_parts = (isset($wo_parts) ? $wo_parts : '');
+        $workorder_parts = (isset($wo_parts) ? $wo_parts : '');
 
-        return view('workorders.update.workorder', [
+        $workorder_labors = (isset($wo_labors) ? $wo_labors : '');
+
+        return view('workorders.update', [
             'company' => $company,
             'vendor' => $vendor,
             'workorder_id' => $workorder_id,
@@ -155,8 +163,11 @@ class WorkOrderController extends Controller
             'payments' => $payments,
             'amount_due' => $amount_due,
 
-            // 'workorder_parts' => $workorder_parts,
-            // 'parts_list' => $parts_list,
+            'workorder_parts' => $workorder_parts,
+            'parts_list' => $parts_list,
+
+            'workorder_labors' => $workorder_labors,
+            'employee_list' => $employee_list,
 
         ]);
     }
@@ -197,36 +208,7 @@ class WorkOrderController extends Controller
         ]);
 
 
-        return redirect()->back()->with('message', 'Workorder updated successfully!');
-    }
-
-    // public function showParts() {
-    //     $workorder_id = $_GET['workorder_id'];
-    //     // WorkOrder Parts
-    //     $wo_parts = WorkorderPart::where('workorder_id', '=', $workorder_id)
-    //     ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
-    //     ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
-
-    //     $parts_list = Part::select('name', 'part_id')->get();
-    //     $workorder_parts = Part::where('part_id', '=', $workorder_id)->select('unit_price')->get();
-    //     return response()->json(['msg'=> $workorder_parts], 200);
-    // }
-
-    public function showParts($workorder_id) {
-        // dd($workorder_id);
-        // WorkOrder Parts
-        $wo_parts = WorkorderPart::where('workorder_id', '=', $workorder_id)
-        ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
-        ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
-
-        $parts_list = Part::select('name', 'part_id')->get();
-
-        $workorder_parts = (isset($wo_parts) ? $wo_parts : '');
-
-        return view('workorders.update.parts', [
-            'workorder_parts' => $workorder_parts,
-            'parts_list' => $parts_list,
-        ]);
+        return Redirect::to(URL::previous() . "#step-workorder")->with('message', 'Workorder updated successfully!');
     }
 
     public function storeParts(Request $request) {
@@ -240,7 +222,7 @@ class WorkOrderController extends Controller
             'exchange_rate' => $request->exchange_rate
         ]);
         
-        return redirect()->back()->with('message', 'Part added successfully!');
+        return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part added successfully!');
     }
 
     public function updateParts(Request $request, $wo_part_id) {
@@ -254,13 +236,13 @@ class WorkOrderController extends Controller
             'exchange_rate' => $request->exchange_rate
         ]);
 
-        return redirect()->back()->with('message', 'Part updated successfully!');
+        return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part updated successfully!');
     }
 
     public function destroyParts($wo_part_id) {
         WorkorderPart::where('wo_part_id', '=', $wo_part_id)->delete();
 
-        return redirect()->back()->with('message', 'Part deleted successfully!');
+        return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part deleted successfully!');
     }
 
     public function getProduct() {
