@@ -11,7 +11,12 @@ class WorkorderPart extends Model
 
     protected $table = 'workorder_part';
     public $timestamps = false;
-    // protected $fillable = [
-    //     'name'
-    // ];
+    protected $fillable = [
+        'workorder_id',
+        'part_id',
+        'quantity',
+        'unit_price',
+        'us_price',
+        'exchange_rate'
+    ];
 }

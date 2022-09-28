@@ -25,7 +25,8 @@ class Workorder extends Model
         'discount',
         'sales_tax_rate',
         'financial',
-        'hardcopy_delivered'
+        'hardcopy_delivered',
+        'vendor_id'
     ];
 
 }

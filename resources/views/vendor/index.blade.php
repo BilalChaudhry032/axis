@@ -48,22 +48,22 @@
                         </td>
                         <td>{{ $vendor->name }}</td>
                         <td>
-                              <!-- Dropdown Button -->
-                              <div class="dropdown-button">
-                                 <a href="#" class="d-flex align-items-center justify-content-end" data-toggle="dropdown">
-                                    <div class="menu-icon mr-0">
-                                          <span></span>
-                                          <span></span>
-                                          <span></span>
-                                    </div>
-                                 </a>
-                                 <div class="dropdown-menu dropdown-menu-right">
-                                    <a href="" data-toggle="modal" data-target="#vendor_edit_modal_{{ $vendor->vendor_id }}">Edit</a>
-                                    
-                                    <a href="" data-toggle="modal" data-target="#vendor_delete_modal_{{ $vendor->vendor_id }}">Delete</a>
+                           <!-- Dropdown Button -->
+                           <div class="dropdown-button">
+                              <a href="#" class="d-flex align-items-center justify-content-end" data-toggle="dropdown">
+                                 <div class="menu-icon mr-0">
+                                       <span></span>
+                                       <span></span>
+                                       <span></span>
                                  </div>
+                              </a>
+                              <div class="dropdown-menu dropdown-menu-right">
+                                 <a href="" data-toggle="modal" data-target="#vendor_edit_modal_{{ $vendor->vendor_id }}">Edit</a>
+                                 
+                                 <a href="" data-toggle="modal" data-target="#vendor_delete_modal_{{ $vendor->vendor_id }}">Delete</a>
                               </div>
-                              <!-- End Dropdown Button -->
+                           </div>
+                           <!-- End Dropdown Button -->
                         </td>
                      </tr>
 

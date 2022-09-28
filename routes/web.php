@@ -46,7 +46,12 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::get('/workorders/workorder/{workorder_id}', [WorkOrderController::class, 'editWorkorder']);
     Route::put('/workorders/workorder/{workorder_id}', [WorkOrderController::class, 'updateWorkorder']);
     // Route::get('/workorders/parts/{workorder_id}', [WorkOrderController::class, 'editParts']);
-    Route::put('/workorders/parts/{workorder_id}', [WorkOrderController::class, 'updateParts']);
+
+    // Route::get('/get-workorder-products', [WorkOrderController::class, 'storeParts']);
+    Route::get('/workorders/{workorder_id}/parts', [WorkOrderController::class, 'showParts']);
+    Route::post('/workorders/parts', [WorkOrderController::class, 'storeParts']);
+    Route::put('/workorders/part/{wo_part_id}', [WorkOrderController::class, 'updateParts']);
+    Route::delete('/workorders/part/{wo_part_id}', [WorkOrderController::class, 'destroyParts']);
 
     Route::get('/get-product', [WorkOrderController::class, 'getProduct']);
 

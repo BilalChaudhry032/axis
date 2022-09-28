@@ -82,12 +82,12 @@ class WorkOrderController extends Controller
 
         // dd($sub_total - $payments);
 
-        // WorkOrder Parts
-        $wo_parts = WorkorderPart::where('workorder_id', '=', $workOrder->workorder_id)
-        ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
-        ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
+        // // WorkOrder Parts
+        // $wo_parts = WorkorderPart::where('workorder_id', '=', $workOrder->workorder_id)
+        // ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
+        // ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
 
-        $parts_list = Part::select('name', 'part_id')->get();
+        // $parts_list = Part::select('name', 'part_id')->get();
 // dd($company);
 
         $workorder_id = (isset($workOrder) ? $workOrder->workorder_id : '');
@@ -122,9 +122,9 @@ class WorkOrderController extends Controller
         $payments = ($payments == 0 ? '0.00' : number_format($payments, 2, '.', ','));
         $amount_due = ($amount_due == 0 ? '0.00' : number_format($amount_due, 2, '.', ','));
 
-        $workorder_parts = (isset($wo_parts) ? $wo_parts : '');
+        // $workorder_parts = (isset($wo_parts) ? $wo_parts : '');
 
-        return view('workorders.update', [
+        return view('workorders.update.workorder', [
             'company' => $company,
             'vendor' => $vendor,
             'workorder_id' => $workorder_id,
@@ -155,8 +155,8 @@ class WorkOrderController extends Controller
             'payments' => $payments,
             'amount_due' => $amount_due,
 
-            'workorder_parts' => $workorder_parts,
-            'parts_list' => $parts_list,
+            // 'workorder_parts' => $workorder_parts,
+            // 'parts_list' => $parts_list,
 
         ]);
     }
@@ -185,12 +185,13 @@ class WorkOrderController extends Controller
             'financial' => $request->financial,
             'hardcopy_delivered' => $request->hardcopy_delivered ? 1 : 0,
             'date_delivered' => Carbon::parse($request->date_delivered)->format('Y-m-d'),
+            'vendor_id' => $request->vendor_id,
             
         ]);
 
         CustomerParent::where('customer_id', '=', $workOrder->customer_id)->update([
             'billing_address_id' => $request->billing_address,
-            'company_id' => $request->company,
+            'company_id' => $request->company_id,
             'postal_address' => $request->postal_address,
             
         ]);
@@ -199,15 +200,72 @@ class WorkOrderController extends Controller
         return redirect()->back()->with('message', 'Workorder updated successfully!');
     }
 
-    public function updateParts(Request $request, $workorder_id) {
-        dd($request);
+    // public function showParts() {
+    //     $workorder_id = $_GET['workorder_id'];
+    //     // WorkOrder Parts
+    //     $wo_parts = WorkorderPart::where('workorder_id', '=', $workorder_id)
+    //     ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
+    //     ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
+
+    //     $parts_list = Part::select('name', 'part_id')->get();
+    //     $workorder_parts = Part::where('part_id', '=', $workorder_id)->select('unit_price')->get();
+    //     return response()->json(['msg'=> $workorder_parts], 200);
+    // }
+
+    public function showParts($workorder_id) {
+        // dd($workorder_id);
+        // WorkOrder Parts
+        $wo_parts = WorkorderPart::where('workorder_id', '=', $workorder_id)
+        ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
+        ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
+
+        $parts_list = Part::select('name', 'part_id')->get();
+
+        $workorder_parts = (isset($wo_parts) ? $wo_parts : '');
+
+        return view('workorders.update.parts', [
+            'workorder_parts' => $workorder_parts,
+            'parts_list' => $parts_list,
+        ]);
+    }
+
+    public function storeParts(Request $request) {
+        // dd($request);
+        WorkorderPart::create([
+            'workorder_id' => $request->workorder_id,
+            'part_id' => $request->part_id,
+            'quantity' => $request->quantity,
+            'unit_price' => $request->unit_price,
+            'us_price' => $request->us_price,
+            'exchange_rate' => $request->exchange_rate
+        ]);
+        
+        return redirect()->back()->with('message', 'Part added successfully!');
+    }
+
+    public function updateParts(Request $request, $wo_part_id) {
+        // dd($request);
+        WorkorderPart::where('wo_part_id', '=', $wo_part_id)->update([
+            'workorder_id' => $request->workorder_id,
+            'part_id' => $request->part_id,
+            'quantity' => $request->quantity,
+            'unit_price' => $request->unit_price,
+            'us_price' => $request->us_price,
+            'exchange_rate' => $request->exchange_rate
+        ]);
 
         return redirect()->back()->with('message', 'Part updated successfully!');
+    }
+
+    public function destroyParts($wo_part_id) {
+        WorkorderPart::where('wo_part_id', '=', $wo_part_id)->delete();
+
+        return redirect()->back()->with('message', 'Part deleted successfully!');
     }
 
     public function getProduct() {
         $part_id = $_GET['part_id'];
         $part_info = Part::where('part_id', '=', $part_id)->select('unit_price')->get();
-        return response()->json(array('msg'=> $part_info), 200);
+        return response()->json(['msg'=> $part_info], 200);
     }
 }

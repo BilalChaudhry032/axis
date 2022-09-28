@@ -26,6 +26,7 @@
 @endsection
 
 @section('content')
+<input type="hidden" id="workorder_id" value="{{ $workorder_id }}">
 <div class="row">
  <div class="col-xl-12">
   <div class="card mb-30">
@@ -228,10 +229,10 @@
           
           <div class="form-row mb-2">
            <div class="col-sm-3">
-            <label class="font-14 bold">Company {{$company_id}}</label>
+            <label class="font-14 bold">Company</label>
            </div>
            <div class="col-sm-9">
-            <select class="search-select" name="company">
+            <select class="search-select" name="company_id">
              <option value="">Select Company</option>
              @if (isset($company))
              @foreach ($company as $com)
@@ -285,7 +286,7 @@
             <label class="font-14 bold mb-3">Vendor</label>
            </div>
            <div class="col-sm-9">
-            <select class="search-select" name="company">
+            <select class="search-select" name="vendor_id">
              <option value="">Select Vendor</option>
              @if (isset($vendor))
              @foreach ($vendor as $ven)
@@ -395,17 +396,17 @@
      
      <div id="step-parts" class="tab-pane" role="tabpanel">
       <div class="card-body">
-	   <div class="d-flex justify-content-between">
-			<div class="title-content">
-				<h4 class="font-20 mb-2">Parts</h4>
-			</div>
-			<div>
-				<a href="" data-toggle="modal" data-target="#part_add_modal" type="button" class="btn btn-secondary px-3 py-2">Add Part</a>
-			</div>
-		</div>
+      <div class="d-flex justify-content-between">
+        <div class="title-content">
+          <h4 class="font-20 mb-2">Parts</h4>
+        </div>
+        <div>
+          <a href="" data-toggle="modal" data-target="#part_add_modal" type="button" class="btn btn-secondary px-3 py-2">Add Part</a>
+        </div>
+      </div>
        
        <div class="table-responsive">
-        <table class="text-nowrap">
+        <table class="text-nowrap invoice-list">
          <thead>
           <tr>
            <th>SR#</th>
@@ -430,7 +431,22 @@
            <td>{{ $workorder_part->us_price }}</td>
            <td>{{ $workorder_part->exchange_rate }}</td>
            <td>
-            <a href="" data-toggle="modal" data-target="#part_edit_modal_{{ $workorder_part->wo_part_id }}">Edit</a>
+            <!-- Dropdown Button -->
+            <div class="dropdown-button">
+              <a href="#" class="d-flex align-items-center justify-content-end" data-toggle="dropdown">
+                  <div class="menu-icon mr-0">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                  </div>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right">
+                <a href="" data-toggle="modal" data-target="#part_edit_modal_{{ $workorder_part->wo_part_id }}">Edit</a>
+                  
+                <a href="" data-toggle="modal" data-target="#part_delete_modal_{{ $workorder_part->wo_part_id }}">Delete</a>
+              </div>
+            </div>
+            <!-- End Dropdown Button -->
            </td>
           </tr>
           <!-- Modal Edit Part -->
@@ -443,49 +459,50 @@
                <span aria-hidden="true">&times;</span>
               </button>
              </div>
-             <form action="{{ url('/workorders/parts/'.$workorder_id) }}" method="POST">
+             <form action="{{ url('/workorders/part/'.$workorder_part->wo_part_id) }}" method="POST">
               @csrf
               @method('PUT')
+              <input type="hidden" name="workorder_id" value="{{ $workorder_id }}">
               <div class="modal-body">
-               <div class="row">
+               <div class="row edit-part-parent">
                 <div class="col-12">
                  <div class="form-group">
                   <label for="message-text" class="col-form-label d-block">Product</label>
-                  <select class="search-select-w-100" name="name" id="wo_products">
-					<option value="">Select Product</option>
-					@if (isset($parts_list))
-					@foreach ($parts_list as $part)
-					<option value="{{ $part->part_id }}" {{ ($workorder_part->part_id == $part->part_id) ? 'selected' : '' }} >
-					{{ $part->name }}
-					</option>
+                  <select class="search-select-w-100 get-part-price" name="part_id">
+                    <option value="">Select Product</option>
+                    @if (isset($parts_list))
+                    @foreach ($parts_list as $part)
+                    <option value="{{ $part->part_id }}" {{ ($workorder_part->part_id == $part->part_id) ? 'selected' : '' }} >
+                    {{ $part->name }}
+                    </option>
 
-					@endforeach
-					@endif
-				  </select>
+                    @endforeach
+                    @endif
+                  </select>
                  </div>
                 </div>
                 <div class="col-sm-6">
                  <div class="form-group">
                   <label for="message-text" class="col-form-label">Quantity</label>
-                  <input class="form-control" required name="quantity" id="wo_products_qty" value="{{ $workorder_part->quantity }}">
+                  <input type="number" class="form-control" required name="quantity" value="{{ $workorder_part->quantity }}">
                  </div>
                 </div>
                 <div class="col-sm-6">
                  <div class="form-group">
                   <label for="message-text" class="col-form-label">Unit Price</label>
-                  <input class="form-control" required name="unit_price" id="wo_products_up" value="{{ $workorder_part->unit_price }}">
+                  <input type="number" class="form-control get-unit_price" required name="unit_price" value="{{ $workorder_part->unit_price }}">
                  </div>
                 </div>
                 <div class="col-sm-6">
                  <div class="form-group">
                   <label for="message-text" class="col-form-label">US$</label>
-                  <input class="form-control" required name="us_price" value="{{ $workorder_part->us_price }}">
+                  <input type="number" class="form-control" required name="us_price" value="{{ $workorder_part->us_price }}">
                  </div>
                 </div>
                 <div class="col-sm-6">
                  <div class="form-group">
                   <label for="message-text" class="col-form-label">Ex. Rate</label>
-                  <input class="form-control" required name="exchange_rate" value="{{ $workorder_part->exchange_rate }}">
+                  <input type="number" class="form-control" required name="exchange_rate" value="{{ $workorder_part->exchange_rate }}">
                  </div>
                 </div>
                </div>
@@ -498,6 +515,25 @@
              </form>
             </div>
            </div>
+          </div>
+
+          <!-- Modal Delete -->
+          <div class="modal fade" id="part_delete_modal_{{ $workorder_part->wo_part_id }}" tabindex="-1" role="dialog" aria-labelledby="vendor_delete_label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <form action="{{ url('/workorders/part/'.$workorder_part->wo_part_id) }}" method="POST">
+                      @csrf
+                      @method('DELETE')
+                      <div class="modal-body">
+                        <h4>Are you sure, you want to Delete this Product?</h4>
+                      </div>
+                      <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary bg-danger">Delete</button>
+                      </div>
+                  </form>
+                </div>
+            </div>
           </div>
           @endforeach
           @endif
@@ -555,14 +591,15 @@
 				<span aria-hidden="true">&times;</span>
 			</button>
 			</div>
-			<form action="{{ url('/parts') }}" method="POST">
-				@csrf
+      <form action="{{ url('/workorders/parts') }}" method="POST">
+        @csrf
+        <input type="hidden" name="workorder_id" value="{{ $workorder_id }}">
 				<div class="modal-body">
 				<div class="row">
                 <div class="col-12">
                  <div class="form-group">
                   <label for="message-text" class="col-form-label d-block">Product</label>
-                  <select class="search-select-w-100" name="name" id="add-product">
+                  <select class="search-select-w-100" name="part_id" id="add-product">
 					<option value="">Select Product</option>
 					@if (isset($parts_list))
 					@foreach ($parts_list as $part)
@@ -578,31 +615,31 @@
                 <div class="col-sm-6">
                  <div class="form-group">
                   <label for="message-text" class="col-form-label">Quantity</label>
-                  <input class="form-control" type="number" min="1" required name="quantity">
+                  <input class="form-control" type="number" required name="quantity" id="add-product_qty">
                  </div>
                 </div>
                 <div class="col-sm-6">
                  <div class="form-group">
                   <label for="message-text" class="col-form-label">Unit Price</label>
-                  <input class="form-control" required name="unit_price" id="unit_price">
+                  <input class="form-control" type="number" required name="unit_price" id="add-product_up">
                  </div>
                 </div>
                 <div class="col-sm-6">
                  <div class="form-group">
                   <label for="message-text" class="col-form-label">US$</label>
-                  <input class="form-control" required name="us_price">
+                  <input class="form-control" type="number" required name="us_price" value="0">
                  </div>
                 </div>
                 <div class="col-sm-6">
                  <div class="form-group">
                   <label for="message-text" class="col-form-label">Ex. Rate</label>
-                  <input class="form-control" required name="exchange_rate">
+                  <input class="form-control" type="number" required name="exchange_rate" value="0">
                  </div>
                 </div>
                </div>
 				</div>
 				<div class="modal-footer">
-				<button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+				<button type="reset" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
 				<button type="submit" class="btn btn-primary">Add Part</button>
 				</div>
 			</form>
@@ -632,29 +669,68 @@
   });
   
   $(".search-select").select2({
-   dropdownAutoWidth: true,
+   dropdownAutoWidth: false,
+   width: '100%'
   });
   $(".search-select-w-100").select2({
    dropdownAutoWidth: false,
    width: '100%',
   });
 
-  $('#wo_products').change(function() {
-	$('#wo_products_qty').val('');
-	$('#wo_products_up').val('');
-  });
+  // $('#wo_products').change(function() {
+	// $('#wo_products_qty').val('');
+	// $('#wo_products_up').val('');
+  // });
+
+  // $('#part_add_modal_btn').click(function(e) {
+  //   e.preventDefault();
+  //   $('#part_add_modal').modal('show');
+  //   $('#part_add_form').get(0).reset();
+  // });
 
   $('#add-product').change(function() {
-	$.ajax({
-		type:'GET',
-		url:'/get-product',
-		data: {
-			part_id: $(this).val(),
-		},
-		success:function(data) {
-			$("#unit_price").val(data.msg[0]['unit_price']);
-		}
-	});
+    $.ajax({
+      type:'GET',
+      url:'/get-product',
+      data: {
+        part_id: $(this).val(),
+      },
+      success:function(data) {
+        $("#add-product_up").val(data.msg[0]['unit_price']);
+        $('#add-product_qty').val(1);
+      }
+    });
+  });
+
+  $('.get-part-price').change(function() {
+    let parent = $(this).closest(".edit-part-parent");
+
+    $.ajax({
+      type:'GET',
+      url:'/get-product',
+      data: {
+        part_id: $(this).val(),
+      },
+      success:function(data) {
+        parent.find(".get-unit_price").val(data.msg[0]['unit_price']);
+      }
+    });
+  });
+
+  $('#step-parts-btn').click(function() {
+    console.log($('#workorder_id').val());
+    $.ajax({
+      type:'GET',
+      url:'/get-workorder-products',
+      data: {
+        workorder_id: $('#workorder_id').val(),
+      },
+      success:function(data) {
+        // parent.find(".get-unit_price").val(data.msg[0]['unit_price']);
+        // $('#wo_products_qty').val(1);
+        console.log(data.msg[0]['unit_price']);
+      }
+    });
   });
   
  });
