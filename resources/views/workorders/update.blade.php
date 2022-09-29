@@ -694,8 +694,8 @@
           </div>
           
           <div id="step-payment" class="tab-pane" role="tabpanel">
-						<div class="card-body">
-              <div class="d-flex justify-content-between">
+            <div class="card-body px-0">
+              <div class="d-flex justify-content-between px-3">
                 <div class="title-content">
                   <h4 class="font-20 mb-2">Payment</h4>
                 </div>
@@ -708,15 +708,15 @@
                 <table class="text-nowrap invoice-list">
                   <thead>
                     <tr>
-                      <th>SR#</th>
+                      <th style="padding-left: 30px;">SR#</th>
                       <th>Payment Method</th>
                       <th>Payment Date</th>
                       <th>Payment Amount</th>
                       <th>Bank Name</th>
-											<th>Cheque#</th>
-											<th>Cheque Date</th>
-											<th>Amount</th>
-											<th>Received</th>
+                      <th>Cheque#</th>
+                      <th>Cheque Date</th>
+                      <th>Amount</th>
+                      <th>Received</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -724,17 +724,17 @@
                     @if (isset($workorder_payments))
                     @foreach ($workorder_payments as $workorder_payment)
                     <tr>
-                      <td>
+                      <td style="padding-left: 30px;">
                         {{ (($workorder_payments->currentPage() -1) * $workorder_payments->perPage()) + $loop->index + 1 }}
                       </td>
                       <td>{{ $workorder_payment->name }}</td>
                       <td>{{ \Carbon\Carbon::parse($workorder_payment->payment_date)->format('d-m-Y') }}</td>
                       <td>{{ $workorder_payment->payment_amount }}</td>
                       <td>{{ $workorder_payment->bank_name }}</td>
-											<td>{{ $workorder_payment->cheque_num }}</td>
-											<td>{{ \Carbon\Carbon::parse($workorder_payment->cheque_date)->format('d-m-Y') }}</td>
-											<td>{{ $workorder_payment->cheque_amount }}</td>
-											<td>{{ $workorder_payment->received == 1 ? 'Yes' : 'No' }}</td>
+                      <td>{{ $workorder_payment->cheque_num }}</td>
+                      <td>{{ \Carbon\Carbon::parse($workorder_payment->cheque_date)->format('d-m-Y') }}</td>
+                      <td>{{ $workorder_payment->cheque_amount }}</td>
+                      <td>{{ $workorder_payment->received == 1 ? 'Yes' : 'No' }}</td>
                       <td>
                         <!-- Dropdown Button -->
                         <div class="dropdown-button">
@@ -786,39 +786,39 @@
                                     </select>
                                   </div>
                                 </div>
-																<div class="col-sm-6">
+                                <div class="col-sm-6">
                                   <div class="form-group">
                                     <label for="message-text" class="col-form-label">Payment Amount</label>
                                     <input type="number" class="form-control" required name="payment_amount" 
-																			value="{{ $workorder_payment->payment_amount }}">
+                                    value="{{ $workorder_payment->payment_amount }}">
                                   </div>
                                 </div>
                                 <div class="col-sm-6">
                                   <div class="form-group">
                                     <label for="message-text" class="col-form-label">Payment Date</label>
-																		<!-- Date Picker -->
-																		<div class="dashboard-date style--four">
-																			<span class="input-group-addon">
-																				<img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
-																			</span>
-																			<input type="text" class="simple-date-picker" placeholder="Select Date" name="payment_date" 
-																				value="{{ \Carbon\Carbon::parse($workorder_payment->payment_date)->format('d-m-Y') }}"/>
-																		</div>
-																		<!-- End Date Picker -->
-																	</div>
+                                    <!-- Date Picker -->
+                                    <div class="dashboard-date style--four">
+                                      <span class="input-group-addon">
+                                        <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
+                                      </span>
+                                      <input type="text" class="simple-date-picker" placeholder="Select Date" name="payment_date" 
+                                      value="{{ \Carbon\Carbon::parse($workorder_payment->payment_date)->format('d-m-Y') }}"/>
+                                    </div>
+                                    <!-- End Date Picker -->
+                                  </div>
                                 </div>
                                 <div class="col-sm-6">
                                   <div class="form-group">
                                     <label for="message-text" class="col-form-label">Cheque Date</label>
-																		<!-- Date Picker -->
-																		<div class="dashboard-date style--four">
-																			<span class="input-group-addon">
-																				<img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
-																			</span>
-																			<input type="text" class="simple-date-picker" placeholder="Select Date" name="cheque_date" 
-																				value="{{ \Carbon\Carbon::parse($workorder_payment->cheque_date)->format('d-m-Y') }}"/>
-																		</div>
-																		<!-- End Date Picker -->
+                                    <!-- Date Picker -->
+                                    <div class="dashboard-date style--four">
+                                      <span class="input-group-addon">
+                                        <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
+                                      </span>
+                                      <input type="text" class="simple-date-picker" placeholder="Select Date" name="cheque_date" 
+                                      value="{{ \Carbon\Carbon::parse($workorder_payment->cheque_date)->format('d-m-Y') }}"/>
+                                    </div>
+                                    <!-- End Date Picker -->
                                   </div>
                                 </div>
                                 <div class="col-sm-6">
@@ -827,27 +827,29 @@
                                     <input type="text" class="form-control" name="bank_name" value="{{ $workorder_payment->bank_name }}">
                                   </div>
                                 </div>
-																<div class="col-sm-6">
+                                <div class="col-sm-6">
                                   <div class="form-group">
                                     <label for="message-text" class="col-form-label">Cheque#</label>
                                     <input type="number" class="form-control" name="cheque_num" value="{{ $workorder_payment->cheque_num }}">
                                   </div>
                                 </div>
-																
-																<div class="col-sm-6">
+                                
+                                <div class="col-sm-6">
                                   <div class="form-group">
                                     <label for="message-text" class="col-form-label">Amount</label>
                                     <input type="number" class="form-control" name="cheque_amount" value="{{ $workorder_payment->cheque_amount }}">
                                   </div>
                                 </div>
-																<div class="col-sm-6  d-flex align-items-center mt-20">
-																	<div class="d-flex align-items-center">
-																		<label class="custom-checkbox position-relative mr-2">
-																			<input type="checkbox" id="{{ 'received_'.$workorder_payment->payment_id }}" {{ $workorder_payment->received == 1 ? 'checked' : '' }}>
-																			<span class="checkmark"></span>
-																		</label>
-																		<label for="{{ 'received_'.$workorder_payment->payment_id }}">Received</label>
-																	</div>
+                                <div class="col-sm-6">
+                                  <label for="message-text" class="col-form-label">Received</label>
+                                  <!-- Switch -->
+                                  <label class="switch with-icon">
+                                    <input type="checkbox" name="received" {{ $workorder_payment->received == 1 ? 'checked' : '' }}>
+                                    <span class="control">
+                                      <span class="check"></span>
+                                    </span>
+                                  </label>
+                                  <!-- End Switch -->
                                 </div>
                               </div>
                               
@@ -1044,42 +1046,87 @@
         @csrf
         <input type="hidden" name="workorder_id" value="{{ $workorder_id }}">
         <div class="modal-body">
-          <div class="row">
-            <div class="col-12">
+          <div class="row edit-payment-parent">
+            <div class="col-6">
               <div class="form-group">
                 <label for="message-text" class="col-form-label d-block">Payment Method</label>
                 <select class="search-select-w-100 get-payment-price" name="payment_method_id">
-									<option value="">Select Payment Method</option>
-									@if (isset($payment_method_list))
-									@foreach ($payment_method_list as $payment_method)
-									<option value="{{ $payment_method->payment_method_id }}">
-										{{ $payment_method->name }}
-									</option>
-									
-									@endforeach
-									@endif
-								</select>
+                  <option value="">Select Payment Method</option>
+                  @if (isset($payment_method_list))
+                  @foreach ($payment_method_list as $payment_method)
+                  <option value="{{ $payment_method->payment_method_id }}">
+                    {{ $payment_method->name }}
+                  </option>
+                  
+                  @endforeach
+                  @endif
+                </select>
               </div>
             </div>
             <div class="col-sm-6">
               <div class="form-group">
-                <label for="message-text" class="col-form-label">Billable Hours</label>
-                <input class="form-control" type="number" required name="billable_hours" id="add-payment_bh" value="0">
+                <label for="message-text" class="col-form-label">Payment Amount</label>
+                <input type="number" class="form-control" required name="payment_amount">
               </div>
             </div>
             <div class="col-sm-6">
               <div class="form-group">
-                <label for="message-text" class="col-form-label">Billing Rate</label>
-                <input class="form-control" type="number" required name="hourly_rate" id="add-payment_br" value="0">
+                <label for="message-text" class="col-form-label">Payment Date</label>
+                <!-- Date Picker -->
+                <div class="dashboard-date style--four">
+                  <span class="input-group-addon">
+                    <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
+                  </span>
+                  <input type="text" class="simple-date-picker" placeholder="Select Date" name="payment_date"/>
+                </div>
+                <!-- End Date Picker -->
               </div>
             </div>
-            <div class="col-sm-12">
+            <div class="col-sm-6">
               <div class="form-group">
-                <label for="message-text" class="col-form-label">Comments</label>
-                <textarea class="theme-input-style style--three" name="comments"></textarea>
+                <label for="message-text" class="col-form-label">Cheque Date</label>
+                <!-- Date Picker -->
+                <div class="dashboard-date style--four">
+                  <span class="input-group-addon">
+                    <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
+                  </span>
+                  <input type="text" class="simple-date-picker" placeholder="Select Date" name="cheque_date"/>
+                </div>
+                <!-- End Date Picker -->
               </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Bank Name</label>
+                <input type="text" class="form-control" name="bank_name">
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Cheque#</label>
+                <input type="number" class="form-control" name="cheque_num">
+              </div>
+            </div>
+            
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Amount</label>
+                <input type="number" class="form-control" name="cheque_amount">
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <label for="message-text" class="col-form-label">Received</label>
+              <!-- Switch -->
+              <label class="switch with-icon">
+                <input type="checkbox" name="received">
+                <span class="control">
+                  <span class="check"></span>
+                </span>
+              </label>
+              <!-- End Switch -->
             </div>
           </div>
+          
         </div>
         <div class="modal-footer">
           <button type="reset" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>

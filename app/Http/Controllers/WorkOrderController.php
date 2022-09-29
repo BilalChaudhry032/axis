@@ -293,31 +293,39 @@ class WorkOrderController extends Controller
     }
 
     public function storePayments(Request $request) {
-        dd($request);
-        WorkorderLabor::create([
-            'workorder_id' => $request->workorder_id,
-            'employee_id' => $request->technician_id,
-            'billable_hours' => $request->billable_hours,
-            'hourly_rate' => $request->hourly_rate,
-            'comments' => $request->comments
+        // dd($request);
+        Payment::create([
+            'workorder_id'      => $request->workorder_id,
+            'payment_method_id' => $request->payment_method_id,
+            'payment_amount'    => $request->payment_amount,
+            'payment_date'      => Carbon::parse($request->payment_date)->format('Y-m-d'),
+            'cheque_date'       => Carbon::parse($request->cheque_date)->format('Y-m-d'),
+            'bank_name'         => $request->bank_name,
+            'cheque_num'        => $request->cheque_num,
+            'cheque_amount'     => $request->cheque_amount,
+            'received'          => $request->received ? 1 : 0
         ]);
         
         return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment added successfully!');
     }
     public function updatePayments(Request $request, $payment_id) {
-        dd($request);
-        WorkorderLabor::where('payment_id', '=', $payment_id)->update([
-            'workorder_id' => $request->workorder_id,
-            'employee_id' => $request->technician_id,
-            'billable_hours' => $request->billable_hours,
-            'hourly_rate' => $request->hourly_rate,
-            'comments' => $request->comments
+        // dd($request);
+        Payment::where('payment_id', '=', $payment_id)->update([
+            'workorder_id'      => $request->workorder_id,
+            'payment_method_id' => $request->payment_method_id,
+            'payment_amount'    => $request->payment_amount,
+            'payment_date'      => Carbon::parse($request->payment_date)->format('Y-m-d'),
+            'cheque_date'       => Carbon::parse($request->cheque_date)->format('Y-m-d'),
+            'bank_name'         => $request->bank_name,
+            'cheque_num'        => $request->cheque_num,
+            'cheque_amount'     => $request->cheque_amount,
+            'received'          => $request->received ? 1 : 0
         ]);
 
         return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment updated successfully!');
     }
     public function destroyPayments($payment_id) {
-        WorkorderLabor::where('payment_id', '=', $payment_id)->delete();
+        Payment::where('payment_id', '=', $payment_id)->delete();
 
         return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment deleted successfully!');
     }
