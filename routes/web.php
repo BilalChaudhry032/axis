@@ -60,6 +60,10 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::put('/workorders/labor/{wo_labor_id}', [WorkOrderController::class, 'updateLabors']);
     Route::delete('/workorders/labor/{wo_labor_id}', [WorkOrderController::class, 'destroyLabors']);
 
+    Route::post('/workorders/payments', [WorkOrderController::class, 'storePayments']);
+    Route::put('/workorders/payment/{payment_id}', [WorkOrderController::class, 'updatePayments']);
+    Route::delete('/workorders/payment/{payment_id}', [WorkOrderController::class, 'destroyPayments']);
+
     // *** Routes for Workorder and related items -End- ***
 
 });

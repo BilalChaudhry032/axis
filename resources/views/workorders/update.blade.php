@@ -623,7 +623,7 @@
                                 <div class="col-12">
                                   <div class="form-group">
                                     <label for="message-text" class="col-form-label d-block">Technician</label>
-                                    <select class="search-select-w-100 get-labor-price" name="employee_id">
+                                    <select class="search-select-w-100 get-labor-price" name="technician_id">
                                       <option value="">Select Technician</option>
                                       @if (isset($employee_list))
                                       @foreach ($employee_list as $employee)
@@ -651,7 +651,7 @@
                                 <div class="col-sm-12">
                                   <div class="form-group">
                                     <label for="message-text" class="col-form-label">Comments</label>
-                                    <input type="text" class="form-control" name="comments" value="{{ $workorder_labor->comments }}">
+                                    <textarea class="theme-input-style style--three" name="comments">{{ $workorder_labor->comments }}</textarea>
                                   </div>
                                 </div>
                               </div>
@@ -694,10 +694,198 @@
           </div>
           
           <div id="step-payment" class="tab-pane" role="tabpanel">
-            <div class="card-body">
-              <h4 class="font-20 mb-30">Payment</h4>
+						<div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div class="title-content">
+                  <h4 class="font-20 mb-2">Payment</h4>
+                </div>
+                <div>
+                  <a href="" data-toggle="modal" data-target="#payment_add_modal" type="button" class="btn btn-secondary px-3 py-2">Add Payment</a>
+                </div>
+              </div>
               
+              <div class="table-responsive">
+                <table class="text-nowrap invoice-list">
+                  <thead>
+                    <tr>
+                      <th>SR#</th>
+                      <th>Payment Method</th>
+                      <th>Payment Date</th>
+                      <th>Payment Amount</th>
+                      <th>Bank Name</th>
+											<th>Cheque#</th>
+											<th>Cheque Date</th>
+											<th>Amount</th>
+											<th>Received</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @if (isset($workorder_payments))
+                    @foreach ($workorder_payments as $workorder_payment)
+                    <tr>
+                      <td>
+                        {{ (($workorder_payments->currentPage() -1) * $workorder_payments->perPage()) + $loop->index + 1 }}
+                      </td>
+                      <td>{{ $workorder_payment->name }}</td>
+                      <td>{{ \Carbon\Carbon::parse($workorder_payment->payment_date)->format('d-m-Y') }}</td>
+                      <td>{{ $workorder_payment->payment_amount }}</td>
+                      <td>{{ $workorder_payment->bank_name }}</td>
+											<td>{{ $workorder_payment->cheque_num }}</td>
+											<td>{{ \Carbon\Carbon::parse($workorder_payment->cheque_date)->format('d-m-Y') }}</td>
+											<td>{{ $workorder_payment->cheque_amount }}</td>
+											<td>{{ $workorder_payment->received == 1 ? 'Yes' : 'No' }}</td>
+                      <td>
+                        <!-- Dropdown Button -->
+                        <div class="dropdown-button">
+                          <a href="#" class="d-flex align-items-center justify-content-end" data-toggle="dropdown">
+                            <div class="menu-icon mr-0">
+                              <span></span>
+                              <span></span>
+                              <span></span>
+                            </div>
+                          </a>
+                          <div class="dropdown-menu dropdown-menu-right">
+                            <a href="" data-toggle="modal" data-target="#payment_edit_modal_{{ $workorder_payment->payment_id }}">Edit</a>
+                            
+                            <a href="" data-toggle="modal" data-target="#payment_delete_modal_{{ $workorder_payment->payment_id }}">Delete</a>
+                          </div>
+                        </div>
+                        <!-- End Dropdown Button -->
+                      </td>
+                    </tr>
+                    <!-- Modal Edit Payment -->
+                    <div class="modal fade" id="payment_edit_modal_{{ $workorder_payment->payment_id }}" tabindex="-1" role="dialog" aria-labelledby="payment_edit_label" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="payment_edit_label">Update Payment</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <form action="{{ url('/workorders/payment/'.$workorder_payment->payment_id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="workorder_id" value="{{ $workorder_id }}">
+                            <div class="modal-body">
+                              <div class="row edit-payment-parent">
+                                <div class="col-6">
+                                  <div class="form-group">
+                                    <label for="message-text" class="col-form-label d-block">Payment Method</label>
+                                    <select class="search-select-w-100 get-payment-price" name="payment_method_id">
+                                      <option value="">Select Payment Method</option>
+                                      @if (isset($payment_method_list))
+                                      @foreach ($payment_method_list as $payment_method)
+                                      <option value="{{ $payment_method->payment_method_id }}" {{ ($payment_method->payment_method_id == $workorder_payment->payment_method_id) ? 'selected' : '' }} >
+                                        {{ $payment_method->name }}
+                                      </option>
+                                      
+                                      @endforeach
+                                      @endif
+                                    </select>
+                                  </div>
+                                </div>
+																<div class="col-sm-6">
+                                  <div class="form-group">
+                                    <label for="message-text" class="col-form-label">Payment Amount</label>
+                                    <input type="number" class="form-control" required name="payment_amount" 
+																			value="{{ $workorder_payment->payment_amount }}">
+                                  </div>
+                                </div>
+                                <div class="col-sm-6">
+                                  <div class="form-group">
+                                    <label for="message-text" class="col-form-label">Payment Date</label>
+																		<!-- Date Picker -->
+																		<div class="dashboard-date style--four">
+																			<span class="input-group-addon">
+																				<img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
+																			</span>
+																			<input type="text" class="simple-date-picker" placeholder="Select Date" name="payment_date" 
+																				value="{{ \Carbon\Carbon::parse($workorder_payment->payment_date)->format('d-m-Y') }}"/>
+																		</div>
+																		<!-- End Date Picker -->
+																	</div>
+                                </div>
+                                <div class="col-sm-6">
+                                  <div class="form-group">
+                                    <label for="message-text" class="col-form-label">Cheque Date</label>
+																		<!-- Date Picker -->
+																		<div class="dashboard-date style--four">
+																			<span class="input-group-addon">
+																				<img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
+																			</span>
+																			<input type="text" class="simple-date-picker" placeholder="Select Date" name="cheque_date" 
+																				value="{{ \Carbon\Carbon::parse($workorder_payment->cheque_date)->format('d-m-Y') }}"/>
+																		</div>
+																		<!-- End Date Picker -->
+                                  </div>
+                                </div>
+                                <div class="col-sm-6">
+                                  <div class="form-group">
+                                    <label for="message-text" class="col-form-label">Bank Name</label>
+                                    <input type="text" class="form-control" name="bank_name" value="{{ $workorder_payment->bank_name }}">
+                                  </div>
+                                </div>
+																<div class="col-sm-6">
+                                  <div class="form-group">
+                                    <label for="message-text" class="col-form-label">Cheque#</label>
+                                    <input type="number" class="form-control" name="cheque_num" value="{{ $workorder_payment->cheque_num }}">
+                                  </div>
+                                </div>
+																
+																<div class="col-sm-6">
+                                  <div class="form-group">
+                                    <label for="message-text" class="col-form-label">Amount</label>
+                                    <input type="number" class="form-control" name="cheque_amount" value="{{ $workorder_payment->cheque_amount }}">
+                                  </div>
+                                </div>
+																<div class="col-sm-6  d-flex align-items-center mt-20">
+																	<div class="d-flex align-items-center">
+																		<label class="custom-checkbox position-relative mr-2">
+																			<input type="checkbox" id="{{ 'received_'.$workorder_payment->payment_id }}" {{ $workorder_payment->received == 1 ? 'checked' : '' }}>
+																			<span class="checkmark"></span>
+																		</label>
+																		<label for="{{ 'received_'.$workorder_payment->payment_id }}">Received</label>
+																	</div>
+                                </div>
+                              </div>
+                              
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary">Save changes</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Modal Delete -->
+                    <div class="modal fade" id="labor_delete_modal_{{ $workorder_payment->payment_id }}" tabindex="-1" role="dialog" aria-labelledby="vendor_delete_label" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                          <form action="{{ url('/workorders/labor/'.$workorder_payment->payment_id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <div class="modal-body">
+                              <h4>Are you sure, you want to Delete this Labor?</h4>
+                            </div>
+                            <div class="modal-footer border-0">
+                              <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary bg-danger">Delete</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                    @endforeach
+                    @endif
+                  </tbody>
+                </table>
+              </div>
             </div>
+            {!! $workorder_labors->links('pagination::bootstrap-5') !!}
           </div>
           
           <div id="step-history" class="tab-pane" role="tabpanel">
@@ -800,7 +988,7 @@
             <div class="col-12">
               <div class="form-group">
                 <label for="message-text" class="col-form-label d-block">Technician</label>
-                <select class="search-select-w-100" name="employee_id" id="add-employee">
+                <select class="search-select-w-100" name="technician_id" id="add-employee">
                   <option value="">Select Technician</option>
                   @if (isset($employee_list))
                   @foreach ($employee_list as $employee)
@@ -816,19 +1004,79 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label for="message-text" class="col-form-label">Billable Hours</label>
-                <input class="form-control" type="number" required name="billable_hours" id="add-employee_bh">
+                <input class="form-control" type="number" required name="billable_hours" id="add-employee_bh" value="0">
               </div>
             </div>
             <div class="col-sm-6">
               <div class="form-group">
                 <label for="message-text" class="col-form-label">Billing Rate</label>
-                <input class="form-control" type="number" required name="hourly_rate" id="add-employee_br">
+                <input class="form-control" type="number" required name="hourly_rate" id="add-employee_br" value="0">
               </div>
             </div>
             <div class="col-sm-12">
               <div class="form-group">
                 <label for="message-text" class="col-form-label">Comments</label>
-                <input class="form-control" type="text" required name="comments">
+                <textarea class="theme-input-style style--three" name="comments"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="reset" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Add Labor</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Add Payment  -->
+<div class="modal fade" id="payment_add_modal" tabindex="-1" role="dialog" aria-labelledby="payment_add_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="payment_add_label">Add Payment In Workorder</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{{ url('/workorders/payments') }}" method="POST">
+        @csrf
+        <input type="hidden" name="workorder_id" value="{{ $workorder_id }}">
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-12">
+              <div class="form-group">
+                <label for="message-text" class="col-form-label d-block">Payment Method</label>
+                <select class="search-select-w-100 get-payment-price" name="payment_method_id">
+									<option value="">Select Payment Method</option>
+									@if (isset($payment_method_list))
+									@foreach ($payment_method_list as $payment_method)
+									<option value="{{ $payment_method->payment_method_id }}">
+										{{ $payment_method->name }}
+									</option>
+									
+									@endforeach
+									@endif
+								</select>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Billable Hours</label>
+                <input class="form-control" type="number" required name="billable_hours" id="add-payment_bh" value="0">
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Billing Rate</label>
+                <input class="form-control" type="number" required name="hourly_rate" id="add-payment_br" value="0">
+              </div>
+            </div>
+            <div class="col-sm-12">
+              <div class="form-group">
+                <label for="message-text" class="col-form-label">Comments</label>
+                <textarea class="theme-input-style style--three" name="comments"></textarea>
               </div>
             </div>
           </div>

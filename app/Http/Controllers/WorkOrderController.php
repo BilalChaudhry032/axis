@@ -10,6 +10,7 @@ use App\Models\CustomerParent;
 use App\Models\Employee;
 use App\Models\Part;
 use App\Models\Payment;
+use App\Models\PaymentMethod;
 use App\Models\Vendor;
 use App\Models\Workorder;
 use App\Models\WorkorderLabor;
@@ -86,15 +87,24 @@ class WorkOrderController extends Controller
         // WorkOrder Parts
         $wo_parts = WorkorderPart::where('workorder_id', '=', $workOrder->workorder_id)
             ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
-            ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')->paginate(10);
+            ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')
+            ->paginate(10);
         $parts_list = Part::select('name', 'part_id')->get();
 
         // WorkOrder Labors
         $wo_labors = WorkorderLabor::where('workorder_id', '=', $workOrder->workorder_id)
             ->join('employee', 'employee.employee_id', '=', 'workorder_labor.employee_id')
-            ->select('workorder_labor.wo_labor_id', 'workorder_labor.employee_id', 'workorder_labor.billable_hours', 'workorder_labor.hourly_rate', 'workorder_labor.comments', 'employee.first_name', 'employee.last_name')->paginate(10);
-        $employee_list = Employee::select('first_name', 'last_name')->get();
-// dd($wo_labors);
+            ->select('workorder_labor.wo_labor_id', 'workorder_labor.employee_id', 'workorder_labor.billable_hours', 'workorder_labor.hourly_rate', 'workorder_labor.comments', 'employee.first_name', 'employee.last_name')
+            ->paginate(10);
+        $employee_list = Employee::select('employee_id', 'first_name', 'last_name')->get();
+
+        // WorkOrder Payments
+        $wo_payments = Payment::where('workorder_id', '=', $workOrder->workorder_id)
+            ->join('payment_method', 'payment_method.payment_method_id', '=', 'payment.payment_method_id')
+            ->select('payment.payment_id', 'payment.payment_method_id', 'payment.payment_date', 'payment.payment_amount', 'payment.bank_name', 'payment.cheque_num', 'payment.cheque_date', 'payment.cheque_amount', 'payment.received', 'payment_method.name')
+            ->paginate(10);
+        $payment_method_list = PaymentMethod::select('payment_method_id', 'name')->get();
+// dd($wo_payments);
 
         $workorder_id = (isset($workOrder) ? $workOrder->workorder_id : '');
         $date_received = (isset($workOrder) ? Carbon::parse($workOrder->date_received)->format('d-m-Y') : '');
@@ -131,6 +141,8 @@ class WorkOrderController extends Controller
         $workorder_parts = (isset($wo_parts) ? $wo_parts : '');
 
         $workorder_labors = (isset($wo_labors) ? $wo_labors : '');
+
+        $workorder_payments = (isset($wo_payments) ? $wo_payments : '');
 
         return view('workorders.update', [
             'company' => $company,
@@ -169,9 +181,11 @@ class WorkOrderController extends Controller
             'workorder_labors' => $workorder_labors,
             'employee_list' => $employee_list,
 
+            'workorder_payments' => $workorder_payments,
+            'payment_method_list' => $payment_method_list
+
         ]);
     }
-
     public function updateWorkorder(Request $request, $workorder_id) {
         // dd($request);
         // $request->validate([
@@ -224,7 +238,6 @@ class WorkOrderController extends Controller
         
         return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part added successfully!');
     }
-
     public function updateParts(Request $request, $wo_part_id) {
         // dd($request);
         WorkorderPart::where('wo_part_id', '=', $wo_part_id)->update([
@@ -238,16 +251,74 @@ class WorkOrderController extends Controller
 
         return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part updated successfully!');
     }
-
     public function destroyParts($wo_part_id) {
         WorkorderPart::where('wo_part_id', '=', $wo_part_id)->delete();
 
         return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part deleted successfully!');
     }
-
     public function getProduct() {
         $part_id = $_GET['part_id'];
         $part_info = Part::where('part_id', '=', $part_id)->select('unit_price')->get();
         return response()->json(['msg'=> $part_info], 200);
+    }
+
+    public function storeLabors(Request $request) {
+        // dd($request);
+        WorkorderLabor::create([
+            'workorder_id' => $request->workorder_id,
+            'employee_id' => $request->technician_id,
+            'billable_hours' => $request->billable_hours,
+            'hourly_rate' => $request->hourly_rate,
+            'comments' => $request->comments
+        ]);
+        
+        return Redirect::to(URL::previous() . "#step-labor")->with('message', 'Labor added successfully!');
+    }
+    public function updateLabors(Request $request, $wo_labor_id) {
+        // dd($request);
+        WorkorderLabor::where('wo_labor_id', '=', $wo_labor_id)->update([
+            'workorder_id' => $request->workorder_id,
+            'employee_id' => $request->technician_id,
+            'billable_hours' => $request->billable_hours,
+            'hourly_rate' => $request->hourly_rate,
+            'comments' => $request->comments
+        ]);
+
+        return Redirect::to(URL::previous() . "#step-labor")->with('message', 'Labor updated successfully!');
+    }
+    public function destroyLabors($wo_labor_id) {
+        WorkorderLabor::where('wo_labor_id', '=', $wo_labor_id)->delete();
+
+        return Redirect::to(URL::previous() . "#step-labor")->with('message', 'Labor deleted successfully!');
+    }
+
+    public function storePayments(Request $request) {
+        dd($request);
+        WorkorderLabor::create([
+            'workorder_id' => $request->workorder_id,
+            'employee_id' => $request->technician_id,
+            'billable_hours' => $request->billable_hours,
+            'hourly_rate' => $request->hourly_rate,
+            'comments' => $request->comments
+        ]);
+        
+        return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment added successfully!');
+    }
+    public function updatePayments(Request $request, $payment_id) {
+        dd($request);
+        WorkorderLabor::where('payment_id', '=', $payment_id)->update([
+            'workorder_id' => $request->workorder_id,
+            'employee_id' => $request->technician_id,
+            'billable_hours' => $request->billable_hours,
+            'hourly_rate' => $request->hourly_rate,
+            'comments' => $request->comments
+        ]);
+
+        return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment updated successfully!');
+    }
+    public function destroyPayments($payment_id) {
+        WorkorderLabor::where('payment_id', '=', $payment_id)->delete();
+
+        return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment deleted successfully!');
     }
 }

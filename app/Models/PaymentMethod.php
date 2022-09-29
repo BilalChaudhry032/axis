@@ -5,17 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class WorkorderLabor extends Model
+class PaymentMethod extends Model
 {
     use HasFactory;
 
-    protected $table = 'workorder_labor';
+    protected $table = 'payment_method';
     public $timestamps = false;
     protected $fillable = [
-        'workorder_id',
-        'employee_id',
-        'billable_hours',
-        'hourly_rate',
-        'comments'
+        'name'
     ];
 }

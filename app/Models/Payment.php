@@ -11,7 +11,15 @@ class Payment extends Model
 
     protected $table = 'payment';
     public $timestamps = false;
-    // protected $fillable = [
-    //     'name'
-    // ];
+    protected $fillable = [
+        'workorder_id',
+        'payment_method_id',
+        'payment_date',
+        'payment_amount',
+        'bank_name',
+        'cheque_num',
+        'cheque_date',
+        'cheque_amount',
+        'received'
+    ];
 }
