@@ -66,8 +66,6 @@ class WorkOrderController extends Controller
 
         $countries = Country::all();
 
-        $all_billing_address = BillingAddress::all();
-
         $company = Company::get();
 
         $vendor = Vendor::get();
@@ -143,6 +141,10 @@ class WorkOrderController extends Controller
         $workorder_labors = (isset($wo_labors) ? $wo_labors : '');
 
         $workorder_payments = (isset($wo_payments) ? $wo_payments : '');
+
+        $all_billing_address = CustomerParent::where('company_id', '=', $company_id)
+        ->join('billing_address', 'billing_address.billing_address_id', '=', 'customer_parent.billing_address_id')
+        ->select('billing_address.billing_address_id', 'billing_address.name')->get();
 
         return view('workorders.update', [
             'company' => $company,
@@ -256,11 +258,6 @@ class WorkOrderController extends Controller
 
         return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part deleted successfully!');
     }
-    public function getProduct() {
-        $part_id = $_GET['part_id'];
-        $part_info = Part::where('part_id', '=', $part_id)->select('unit_price')->get();
-        return response()->json(['msg'=> $part_info], 200);
-    }
 
     public function storeLabors(Request $request) {
         // dd($request);
@@ -328,5 +325,35 @@ class WorkOrderController extends Controller
         Payment::where('payment_id', '=', $payment_id)->delete();
 
         return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment deleted successfully!');
+    }
+
+
+    // AJAX Functions
+    public function getProduct() {
+        $part_id = $_GET['part_id'];
+        $part_info = Part::where('part_id', '=', $part_id)->select('unit_price')->get();
+        return response()->json(['msg'=> $part_info], 200);
+    }
+    public function getCompanyAddresses() {
+        $wo_company_id = $_GET['wo_company_id'];
+
+        $company_billing_addresses = CustomerParent::where('company_id', '=', $wo_company_id)
+        ->join('billing_address', 'billing_address.billing_address_id', '=', 'customer_parent.billing_address_id')
+        ->select('billing_address.billing_address_id', 'billing_address.name')->get();
+
+        return response()->json(['response'=> $company_billing_addresses], 200);
+    }
+    public function getCompanyPersons() {
+        $wo_company_id = $_GET['wo_company_id'];
+        $wo_billing_address_id = $_GET['wo_billing_address_id'];
+
+        $company_persons = CustomerParent::where([
+            ['company_id', '=', $wo_company_id],
+            ['billing_address_id', '=', $wo_billing_address_id]
+        ])
+        ->join('customer_child', 'customer_child.customer_id', '=', 'customer_parent.customer_id')
+        ->select('customer_child.child_id', 'customer_child.first_name', 'customer_child.last_name')->get();
+
+        return response()->json(['response'=> $company_persons], 200);
     }
 }

@@ -93,7 +93,7 @@
                         <label class="font-14 bold" for="billing_add">Billing Address</label>
                       </div>
                       <div class="col-sm-9">
-                        <select class="search-select" name="billing_address">
+                        <select class="search-select" name="billing_address" id="wo_billing_address">
                           <option value="">Select Billing Address</option>
                           @if (isset($all_billing_address))
                           @foreach ($all_billing_address as $billing_address)
@@ -232,7 +232,7 @@
                         <label class="font-14 bold">Company</label>
                       </div>
                       <div class="col-sm-9">
-                        <select class="search-select" name="company_id">
+                        <select class="search-select" name="company_id" id="wo_company_id">
                           <option value="">Select Company</option>
                           @if (isset($company))
                           @foreach ($company as $com)
@@ -250,7 +250,7 @@
                         <label class="font-14 bold mb-3">Contact Person</label>
                       </div>
                       <div class="col-sm-9">
-                        <select class="search-select" name="contact_person">
+                        <select class="search-select" name="contact_person" id="wo_contact_person">
                           <option value="">Select Contact Person</option>
                           @if (isset($customer_info))
                           @foreach ($customer_info as $contact)
@@ -404,7 +404,7 @@
                   <a href="" data-toggle="modal" data-target="#part_add_modal" type="button" class="btn btn-secondary px-3 py-2">Add Part</a>
                 </div>
               </div>
-              
+              @if (count($workorder_parts) > 0)
               <div class="table-responsive">
                 <table class="text-nowrap invoice-list">
                   <thead>
@@ -419,7 +419,6 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @if (isset($workorder_parts))
                     @foreach ($workorder_parts as $workorder_part)
                     <tr>
                       <td>
@@ -536,10 +535,10 @@
                       </div>
                     </div>
                     @endforeach
-                    @endif
                   </tbody>
                 </table>
               </div>
+              @endif
             </div>
             {!! $workorder_parts->links('pagination::bootstrap-5') !!}
           </div> 
@@ -561,7 +560,7 @@
                   <a href="" data-toggle="modal" data-target="#labor_add_modal" type="button" class="btn btn-secondary px-3 py-2">Add Labor</a>
                 </div>
               </div>
-              
+              @if (count($workorder_labors) > 0)
               <div class="table-responsive">
                 <table class="text-nowrap invoice-list">
                   <thead>
@@ -575,7 +574,6 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @if (isset($workorder_labors))
                     @foreach ($workorder_labors as $workorder_labor)
                     <tr>
                       <td>
@@ -685,10 +683,10 @@
                       </div>
                     </div>
                     @endforeach
-                    @endif
                   </tbody>
                 </table>
               </div>
+              @endif
             </div>
             {!! $workorder_labors->links('pagination::bootstrap-5') !!}
           </div>
@@ -703,7 +701,7 @@
                   <a href="" data-toggle="modal" data-target="#payment_add_modal" type="button" class="btn btn-secondary px-3 py-2">Add Payment</a>
                 </div>
               </div>
-              
+              @if (count($workorder_payments) > 0)
               <div class="table-responsive">
                 <table class="text-nowrap invoice-list">
                   <thead>
@@ -721,7 +719,6 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @if (isset($workorder_payments))
                     @foreach ($workorder_payments as $workorder_payment)
                     <tr>
                       <td style="padding-left: 30px;">
@@ -734,7 +731,9 @@
                       <td>{{ $workorder_payment->cheque_num }}</td>
                       <td>{{ \Carbon\Carbon::parse($workorder_payment->cheque_date)->format('d-m-Y') }}</td>
                       <td>{{ $workorder_payment->cheque_amount }}</td>
-                      <td>{{ $workorder_payment->received == 1 ? 'Yes' : 'No' }}</td>
+                      <td class="font-weight-bold {{ $workorder_payment->received == 1 ? 'text-success' : 'text-danger' }}">
+                        {{ $workorder_payment->received == 1 ? 'Yes' : 'No' }}
+                      </td>
                       <td>
                         <!-- Dropdown Button -->
                         <div class="dropdown-button">
@@ -801,7 +800,7 @@
                                       <span class="input-group-addon">
                                         <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
                                       </span>
-                                      <input type="text" class="simple-date-picker" placeholder="Select Date" name="payment_date" 
+                                      <input type="text" class="simple-date-picker" placeholder="Select Date" autocomplete="off" name="payment_date" 
                                       value="{{ \Carbon\Carbon::parse($workorder_payment->payment_date)->format('d-m-Y') }}"/>
                                     </div>
                                     <!-- End Date Picker -->
@@ -815,7 +814,7 @@
                                       <span class="input-group-addon">
                                         <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
                                       </span>
-                                      <input type="text" class="simple-date-picker" placeholder="Select Date" name="cheque_date" 
+                                      <input type="text" class="simple-date-picker" placeholder="Select Date" autocomplete="off" name="cheque_date" 
                                       value="{{ \Carbon\Carbon::parse($workorder_payment->cheque_date)->format('d-m-Y') }}"/>
                                     </div>
                                     <!-- End Date Picker -->
@@ -830,7 +829,7 @@
                                 <div class="col-sm-6">
                                   <div class="form-group">
                                     <label for="message-text" class="col-form-label">Cheque#</label>
-                                    <input type="number" class="form-control" name="cheque_num" value="{{ $workorder_payment->cheque_num }}">
+                                    <input type="text" class="form-control" name="cheque_num" value="{{ $workorder_payment->cheque_num }}">
                                   </div>
                                 </div>
                                 
@@ -864,14 +863,14 @@
                     </div>
                     
                     <!-- Modal Delete -->
-                    <div class="modal fade" id="labor_delete_modal_{{ $workorder_payment->payment_id }}" tabindex="-1" role="dialog" aria-labelledby="vendor_delete_label" aria-hidden="true">
+                    <div class="modal fade" id="payment_delete_modal_{{ $workorder_payment->payment_id }}" tabindex="-1" role="dialog" aria-labelledby="payment_delete_label" aria-hidden="true">
                       <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
-                          <form action="{{ url('/workorders/labor/'.$workorder_payment->payment_id) }}" method="POST">
+                          <form action="{{ url('/workorders/payment/'.$workorder_payment->payment_id) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <div class="modal-body">
-                              <h4>Are you sure, you want to Delete this Labor?</h4>
+                              <h4>Are you sure, you want to Delete this Payment?</h4>
                             </div>
                             <div class="modal-footer border-0">
                               <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
@@ -882,10 +881,10 @@
                       </div>
                     </div>
                     @endforeach
-                    @endif
                   </tbody>
                 </table>
               </div>
+              @endif
             </div>
             {!! $workorder_labors->links('pagination::bootstrap-5') !!}
           </div>
@@ -1050,7 +1049,7 @@
             <div class="col-6">
               <div class="form-group">
                 <label for="message-text" class="col-form-label d-block">Payment Method</label>
-                <select class="search-select-w-100 get-payment-price" name="payment_method_id">
+                <select class="search-select-w-100 get-payment-price" name="payment_method_id" required>
                   <option value="">Select Payment Method</option>
                   @if (isset($payment_method_list))
                   @foreach ($payment_method_list as $payment_method)
@@ -1066,7 +1065,7 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label for="message-text" class="col-form-label">Payment Amount</label>
-                <input type="number" class="form-control" required name="payment_amount">
+                <input type="number" class="form-control" required name="payment_amount" value="{{ $amount_due}}">
               </div>
             </div>
             <div class="col-sm-6">
@@ -1077,7 +1076,7 @@
                   <span class="input-group-addon">
                     <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
                   </span>
-                  <input type="text" class="simple-date-picker" placeholder="Select Date" name="payment_date"/>
+                  <input type="text" class="simple-date-picker" placeholder="Select Date" autocomplete="off" name="payment_date"/>
                 </div>
                 <!-- End Date Picker -->
               </div>
@@ -1090,7 +1089,7 @@
                   <span class="input-group-addon">
                     <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
                   </span>
-                  <input type="text" class="simple-date-picker" placeholder="Select Date" name="cheque_date"/>
+                  <input type="text" class="simple-date-picker" placeholder="Select Date" autocomplete="off" name="cheque_date"/>
                 </div>
                 <!-- End Date Picker -->
               </div>
@@ -1104,7 +1103,7 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label for="message-text" class="col-form-label">Cheque#</label>
-                <input type="number" class="form-control" name="cheque_num">
+                <input type="text" class="form-control" name="cheque_num">
               </div>
             </div>
             
@@ -1167,62 +1166,96 @@
       width: '100%',
     });
     
-    // $('#wo_products').change(function() {
-      // $('#wo_products_qty').val('');
-      // $('#wo_products_up').val('');
-      // });
-      
-      // $('#part_add_modal_btn').click(function(e) {
-        //   e.preventDefault();
-        //   $('#part_add_modal').modal('show');
-        //   $('#part_add_form').get(0).reset();
-        // });
-        
-        $('#add-product').change(function() {
-          $.ajax({
-            type:'GET',
-            url:'/get-product',
-            data: {
-              part_id: $(this).val(),
-            },
-            success:function(data) {
-              $("#add-product_up").val(data.msg[0]['unit_price']);
-              $('#add-product_qty').val(1);
-            }
+    $('#wo_company_id').change(function() {
+      $.ajax({
+        type:'GET',
+        url:'/get-company-addresses',
+        data: {
+          wo_company_id: $(this).val(),
+        },
+        success:function(data) {
+          $('#wo_billing_address').empty();
+          var defaultOption = new Option('Select Billing Address', '', false, false);
+          $('#wo_billing_address').append(defaultOption).trigger('change');
+          $(data.response).each(function(i) {
+            var newOption = new Option(data.response[i]['name'], data.response[i]['billing_address_id'], false, false);
+            $('#wo_billing_address').append(newOption).trigger('change');
           });
-        });
-        
-        $('.get-part-price').change(function() {
-          let parent = $(this).closest(".edit-part-parent");
-          
-          $.ajax({
-            type:'GET',
-            url:'/get-product',
-            data: {
-              part_id: $(this).val(),
-            },
-            success:function(data) {
-              parent.find(".get-unit_price").val(data.msg[0]['unit_price']);
-            }
-          });
-        });
-        
-        $('#step-parts-btn').click(function() {
-          console.log($('#workorder_id').val());
-          $.ajax({
-            type:'GET',
-            url:'/get-workorder-products',
-            data: {
-              workorder_id: $('#workorder_id').val(),
-            },
-            success:function(data) {
-              // parent.find(".get-unit_price").val(data.msg[0]['unit_price']);
-              // $('#wo_products_qty').val(1);
-              console.log(data.msg[0]['unit_price']);
-            }
-          });
-        });
-        
+        }
       });
-    </script>
-    @endsection
+    });
+    
+    $('#wo_billing_address').change(function() {
+      $.ajax({
+        type:'GET',
+        url:'/get-company-persons',
+        data: {
+          wo_company_id: $('#wo_company_id').val(),
+          wo_billing_address_id: $(this).val(),
+        },
+        success:function(data) {
+          $('#wo_contact_person').empty();
+          var defaultOption = new Option('Select Contact Person', '', false, false);
+          $('#wo_contact_person').append(defaultOption).trigger('change');
+          $(data.response).each(function(i) {
+            var newOption = new Option(
+              ((data.response[i]['first_name']) == null || (data.response[i]['first_name']) == '' ? '' : data.response[i]['first_name'])+' '+((data.response[i]['last_name']) == null || (data.response[i]['last_name']) == '' ? '' : data.response[i]['last_name']), 
+              data.response[i]['child_id'], 
+              false, 
+              false
+            );
+            $('#wo_contact_person').append(newOption).trigger('change');
+            console.log((data.response[i]['first_name']) == null || (data.response[i]['first_name']) == '' );
+          });
+        }
+      });
+    });
+    
+    $('#add-product').change(function() {
+      $.ajax({
+        type:'GET',
+        url:'/get-product',
+        data: {
+          part_id: $(this).val(),
+        },
+        success:function(data) {
+          $("#add-product_up").val(data.msg[0]['unit_price']);
+          $('#add-product_qty').val(1);
+        }
+      });
+    });
+    
+    $('.get-part-price').change(function() {
+      let parent = $(this).closest(".edit-part-parent");
+      
+      $.ajax({
+        type:'GET',
+        url:'/get-product',
+        data: {
+          part_id: $(this).val(),
+        },
+        success:function(data) {
+          parent.find(".get-unit_price").val(data.msg[0]['unit_price']);
+        }
+      });
+    });
+    
+    $('#step-parts-btn').click(function() {
+      console.log($('#workorder_id').val());
+      $.ajax({
+        type:'GET',
+        url:'/get-workorder-products',
+        data: {
+          workorder_id: $('#workorder_id').val(),
+        },
+        success:function(data) {
+          // parent.find(".get-unit_price").val(data.msg[0]['unit_price']);
+          // $('#wo_products_qty').val(1);
+          console.log(data.msg[0]['unit_price']);
+        }
+      });
+    });
+    
+  });
+</script>
+@endsection
