@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="{{ asset('assets/plugins/datepicker/datepicker.min.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/plugins/select2/select2.min.css') }}">
 <link href="{{ asset('assets/plugins/jquery-smartwizard/smart_wizard_all.min.css') }}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{{ asset('assets/plugins/dropzone/dropzone.min.css') }}">
 
 <style>
   .main-content #smartwizard .nav li a {
@@ -544,9 +545,29 @@
           </div> 
           
           <div id="step-report" class="tab-pane" role="tabpanel">
-            <div class="card-body">
-              <h4 class="font-20 mb-30">Report</h4>
-              
+            <div class="card-body px-0">
+              <div class="d-flex justify-content-between px-3">
+                <div class="title-content">
+                  <h4 class="font-20 mb-2">Report</h4>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <!-- Dropzone Start -->
+                  <form action="#" id="dropzone01" class="dropzone" method="post" enctype="multipart/form-data">
+                    <div class="d-flex justify-content-center flex-column align-items-center align-self-center" data-dz-message>
+                      <div class="dz-message bold c2 font-20 mb-3">Click or Drop files here to upload.</div>
+                      <div class="upload-icon">
+                        <img src="{{ asset('assets/img/svg/upload-down.svg') }}" alt="" class="svg">
+                      </div>
+                    </div>
+                  </form>
+                  <!-- Dropzone End -->
+                </div>
+                <div class="col-">
+                  
+                </div>
+              </div>
             </div>
           </div>
           
@@ -890,9 +911,30 @@
           </div>
           
           <div id="step-history" class="tab-pane" role="tabpanel">
-            <div class="card-body">
-              <h4 class="font-20 mb-30">History</h4>
-              
+            <div class="card-body px-0">
+              <div class="d-flex justify-content-between px-3">
+                <div class="title-content">
+                  <h4 class="font-20 mb-2">History</h4>
+                </div>
+              </div>
+              @if (strlen($company_id) > 0)
+              <div class="table-responsive">
+                <table class="">
+                  <thead>
+                    <tr>
+                      <th>SR#</th>
+                      <th>Company</th>
+                      <th>PO#</th>
+                      <th>Report Name</th>
+                      <th>Date Received</th>
+                      <th>Date Required</th>
+                    </tr>
+                  </thead>
+                  <tbody id="history_wrap">
+                  </tbody>
+                </table>
+              </div>
+              @endif
             </div>
           </div>
           
@@ -1149,6 +1191,9 @@
 <script src="{{ asset('assets/plugins/jquery.steps/jquery.steps.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/jquery.steps/custom-jquery-step.js') }}"></script>
 
+<script src="{{ asset('assets/plugins/dropzone/dropzone.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/dropzone/dropzone.custom.js') }}"></script>
+
 <script>
   $(document).ready(function() {
     
@@ -1167,16 +1212,23 @@
     });
     
     $('#wo_company_id').change(function() {
+      var url = "{{url('/get-company-addresses')}}";
       $.ajax({
         type:'GET',
-        url:'/get-company-addresses',
+        url: url,
         data: {
           wo_company_id: $(this).val(),
         },
         success:function(data) {
           $('#wo_billing_address').empty();
-          var defaultOption = new Option('Select Billing Address', '', false, false);
-          $('#wo_billing_address').append(defaultOption).trigger('change');
+          $('#wo_contact_person').empty();
+          
+          var defaultOption1 = new Option('Select Billing Address', '', false, false);
+          $('#wo_billing_address').append(defaultOption1).trigger('change');
+          
+          var defaultOption2 = new Option('Select Contact Person', '', false, false);
+          $('#wo_contact_person').append(defaultOption2).trigger('change');
+          
           $(data.response).each(function(i) {
             var newOption = new Option(data.response[i]['name'], data.response[i]['billing_address_id'], false, false);
             $('#wo_billing_address').append(newOption).trigger('change');
@@ -1186,35 +1238,67 @@
     });
     
     $('#wo_billing_address').change(function() {
-      $.ajax({
-        type:'GET',
-        url:'/get-company-persons',
-        data: {
-          wo_company_id: $('#wo_company_id').val(),
-          wo_billing_address_id: $(this).val(),
-        },
-        success:function(data) {
-          $('#wo_contact_person').empty();
-          var defaultOption = new Option('Select Contact Person', '', false, false);
-          $('#wo_contact_person').append(defaultOption).trigger('change');
-          $(data.response).each(function(i) {
-            var newOption = new Option(
+      if($(this).val() != '') {
+        var url = "{{url('/get-company-persons')}}";
+        $.ajax({
+          type:'GET',
+          url: url,
+          data: {
+            wo_company_id: $('#wo_company_id').val(),
+            wo_billing_address_id: $(this).val(),
+          },
+          success:function(data) {
+            $('#wo_contact_person').empty();
+            var defaultOption = new Option('Select Contact Person', '', false, false);
+            $('#wo_contact_person').append(defaultOption).trigger('change');
+            $(data.response).each(function(i) {
+              var newOption = new Option(
               ((data.response[i]['first_name']) == null || (data.response[i]['first_name']) == '' ? '' : data.response[i]['first_name'])+' '+((data.response[i]['last_name']) == null || (data.response[i]['last_name']) == '' ? '' : data.response[i]['last_name']), 
               data.response[i]['child_id'], 
               false, 
               false
-            );
-            $('#wo_contact_person').append(newOption).trigger('change');
-            console.log((data.response[i]['first_name']) == null || (data.response[i]['first_name']) == '' );
+              );
+              $('#wo_contact_person').append(newOption).trigger('change');
+            });
+          }
+        });
+      }
+    });
+    
+    $('#step-history-btn').click(function() {
+      // console.log($('#wo_company_id').val()+' wo_company_id');
+      // console.log($('#wo_billing_address').val()+' wo_billing_address');
+      var url = "{{url('/get-company-history')}}";
+      $.ajax({
+        type:'GET',
+        url: url,
+        data: {
+          wo_company_id: $('#wo_company_id').val(),
+          wo_billing_address_id: $('#wo_billing_address').val()
+        },
+        success:function(data) {
+          // console.log(data.response);
+          $(data.response).each(function(i) {
+            $('#history_wrap').append(`
+            <tr>
+              <td>`+ parseInt(i+1) +`</td>
+              <td class="text-nowrap">`+(data.company_name['name'])+`</td>
+              <td>`+(data.response[i]['po_num'])+`</td>
+              <td>`+(data.response[i]['report_name'])+`</td>
+              <td>`+(data.response[i]['date_received'])+`</td>
+              <td>`+(data.response[i]['date_delivered'])+`</td>
+            </tr>
+            `);
           });
         }
       });
     });
     
     $('#add-product').change(function() {
+      var url = "{{url('/get-product')}}";
       $.ajax({
         type:'GET',
-        url:'/get-product',
+        url: url,
         data: {
           part_id: $(this).val(),
         },
@@ -1227,10 +1311,10 @@
     
     $('.get-part-price').change(function() {
       let parent = $(this).closest(".edit-part-parent");
-      
+      var url = "{{url('/get-product')}}";
       $.ajax({
         type:'GET',
-        url:'/get-product',
+        url: url,
         data: {
           part_id: $(this).val(),
         },
@@ -1240,22 +1324,22 @@
       });
     });
     
-    $('#step-parts-btn').click(function() {
-      console.log($('#workorder_id').val());
-      $.ajax({
-        type:'GET',
-        url:'/get-workorder-products',
-        data: {
-          workorder_id: $('#workorder_id').val(),
-        },
-        success:function(data) {
-          // parent.find(".get-unit_price").val(data.msg[0]['unit_price']);
-          // $('#wo_products_qty').val(1);
-          console.log(data.msg[0]['unit_price']);
-        }
-      });
-    });
-    
-  });
-</script>
-@endsection
+    // $('#step-parts-btn').click(function() {
+      //   console.log($('#workorder_id').val());
+      //   $.ajax({
+        //     type:'GET',
+        //     url:'/get-workorder-products',
+        //     data: {
+          //       workorder_id: $('#workorder_id').val(),
+          //     },
+          //     success:function(data) {
+            //       // parent.find(".get-unit_price").val(data.msg[0]['unit_price']);
+            //       // $('#wo_products_qty').val(1);
+            //       console.log(data.msg[0]['unit_price']);
+            //     }
+            //   });
+            // });
+            
+          });
+        </script>
+        @endsection

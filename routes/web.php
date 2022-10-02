@@ -66,6 +66,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::put('/workorders/payment/{payment_id}', [WorkOrderController::class, 'updatePayments']);
     Route::delete('/workorders/payment/{payment_id}', [WorkOrderController::class, 'destroyPayments']);
 
+    Route::get('/get-company-history', [WorkOrderController::class, 'getCompanyHistory']);//AJAX
+
     // *** Routes for Workorder and related items -End- ***
 
 });

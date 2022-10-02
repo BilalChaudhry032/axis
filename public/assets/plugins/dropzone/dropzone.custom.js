@@ -14,7 +14,7 @@ $(function() {
     'use strict';
     
     Dropzone.options.dropzone01 = {
-        addRemoveLinks: true,
+        addRemoveLinks: false,
         dictRemoveFile: ''
     };
 });

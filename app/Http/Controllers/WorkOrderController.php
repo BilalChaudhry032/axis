@@ -356,4 +356,22 @@ class WorkOrderController extends Controller
 
         return response()->json(['response'=> $company_persons], 200);
     }
+    public function getCompanyHistory() {
+        $wo_company_id = $_GET['wo_company_id'];
+        $wo_billing_address_id = $_GET['wo_billing_address_id'];
+
+        $company_history = CustomerParent::where([
+            ['company_id', '=', $wo_company_id],
+            ['billing_address_id', '=', $wo_billing_address_id]
+        ])
+        ->join('workorder', 'workorder.customer_id', '=', 'customer_parent.customer_id')
+        ->select('workorder.po_num', 'workorder.report_name', DB::raw('DATE_FORMAT(workorder.date_received, "%d-%m-%Y") as date_received'), DB::raw('DATE_FORMAT(workorder.date_delivered, "%d-%m-%Y") as date_delivered'))->get();
+
+        $company_name = Company::where('company_id', '=', $wo_company_id)->select('name')->first();
+
+        return response()->json(array(
+            'response' => $company_history,
+            'company_name' => $company_name
+        ), 200);
+    }
 }

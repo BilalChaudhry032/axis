@@ -34,7 +34,7 @@
 
 </head>
 
-<body class="sidebar-folded">
+<body>
 
    @if($message = Session::get('message'))
       <div class="alert alert-primary alert-dismissible fade show" role="alert" style="position: fixed; right: 15px; top: 70px; z-index: 9999;">
