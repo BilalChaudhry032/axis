@@ -30,14 +30,20 @@ class AuthController extends Controller
                 ]);
                 Auth::attempt(['username' => $request->username, 'password' => $request->password]);
                 
-                Session::put('user-session', $user);
+                Session::put('user-session', [
+                    'uid' => $user->user_id, 
+                    'uname' => $user->name
+                ]);
                 return redirect('/')->with([
                     'message' => 'Authentication Successful!',
                     'user' => $user
                 ]);
             } elseif(Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
                 
-                Session::put('user-session', $user);
+                Session::put('user-session', [
+                    'uid' => $user->user_id, 
+                    'uname' => $user->name
+                ]);
                 return redirect('/')->with([
                     'message' => 'Authentication Successful!',
                     'user' => $user

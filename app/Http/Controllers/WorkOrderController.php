@@ -29,26 +29,27 @@ class WorkOrderController extends Controller
         $workOrders = Workorder::where([
             ['cancelled', '=', 0],
             ['archived', '=', 0]
-            ])
-            ->orderByDesc('workorder_id')
-            ->join('customer_parent', 'workorder.customer_id', '=', 'customer_parent.customer_id')
-            ->join('company', 'customer_parent.company_id', "=", "company.company_id")
-            ->select("workorder.*", "company.name")
-            ->where('company.name', 'LIKE', "%".request('search')."%")
-            ->orWhere('workorder_id', 'LIKE', "%".request('search')."%")
-            ->orWhere('po_num', 'LIKE', "%".request('search')."%")
-            ->orWhere('report_name', 'LIKE', "%".request('search')."%")
-            // ->orWhere('date_received', 'LIKE', "%".$_date."%")
-            // ->orWhere('date_delivered', 'LIKE', "%".$_date."%")
-            ->paginate(10);
-            // dd(DB::getQueryLog());
-            
-            return view('workorders.index', [
-                'workOrders' => $workOrders
-            ]);
-        }
+        ])
+        ->orderByDesc('workorder_id')
+        ->join('customer_parent', 'workorder.customer_id', '=', 'customer_parent.customer_id')
+        ->join('company', 'customer_parent.company_id', "=", "company.company_id")
+        ->select("workorder.*", "company.name")
+        ->where('company.name', 'LIKE', "%".request('search')."%")
+        ->orWhere('workorder_id', 'LIKE', "%".request('search')."%")
+        ->orWhere('po_num', 'LIKE', "%".request('search')."%")
+        ->orWhere('report_name', 'LIKE', "%".request('search')."%")
+        // ->orWhere('date_received', 'LIKE', "%".$_date."%")
+        // ->orWhere('date_delivered', 'LIKE', "%".$_date."%")
+        ->paginate(10);
+        // dd(DB::getQueryLog());
+        
+        return view('workorders.index', [
+            'workOrders' => $workOrders
+        ]);
+    }
         
         public function createWorkorder() {
+            // dd(session()->get('user-session.uid'));
             $countries = Country::all();
             $company = Company::all();
             $vendor = Vendor::all();
@@ -59,147 +60,197 @@ class WorkOrderController extends Controller
                 'vendor' => $vendor,
             ]);
         }
-        
-        public function editWorkorder($workorder_id) {
-            $workOrder = Workorder::where('workorder_id', '=', $workorder_id)->first();
+        public function storeWorkorder(Request $request) {
+            $sales_tax_rate = 0;
             
-            $customer_address = CustomerParent::where('customer_id', '=', $workOrder->customer_id)->first();
-            
-            $customer_info = CustomerChild::where([
-                ['customer_id', '=', $workOrder->customer_id],
-                ['active', '=', 1]
-                ])->get();
+            $customer = CustomerParent::where([
+                ['company_id', '=', $request->company_id],
+                ['billing_address_id', '=', $request->billing_address]
+                ])
+                ->select('customer_id', 'province')->first();
+                if(!$customer) {
+                    return Redirect::to(url('/workorders/create'))->with('message', 'Customer not found!');
+                }
+                if($request->taxable){
+                    if($customer->province == 'Sindh' || $customer->province == 'Sind'){
+                        $sales_tax_rate = 13;
+                    }else if($customer->province == 'Punjab'){
+                        $sales_tax_rate = 16;
+                    }else{
+                        $sales_tax_rate = 15;
+                    }
+                }
                 
-                $countries = Country::all();
+                $employee_id = session()->get('user-session.uid');
                 
-                $company = Company::get();
                 
-                $vendor = Vendor::get();
+                $new_workorder = Workorder::insertGetId([
+                    'customer_id' => $customer->customer_id,
+                    'employee_id' => $employee_id,
+                    'po_num' => $request->po_num,
+                    'date_received' => Carbon::parse($request->date_received)->format('Y-m-d'),
+                    'report_name' => $request->report_name,
+                    'serial_num' => $request->serial_num,
+                    'problem_desc' => $request->problem_desc,
+                    'country' => $request->country,
+                    'date_delivered' => Carbon::parse($request->date_delivered)->format('Y-m-d'),
+                    'sales_tax_rate' => $sales_tax_rate,
+                    'child_id' => $request->contact_person,
+                    'reference_num' => $request->reference_num,
+                    'branch' => $request->branch ? $request->branch : 0,
+                    'vendor_id' => $request->vendor_id,
+                    'financial' => $request->financial,
+                    'hardcopy_delivered' => $request->hardcopy_delivered ? 1 : 0,
+                    'discount' => $request->discount,
+                    
+                ]);
                 
-                $sql = "select sum(p.quantity*p.unit_price) as sub_total from workorder_part p, part pa where p.workorder_id=$workOrder->workorder_id and p.part_id=pa.part_id";
-                $sub_total = DB::select($sql);
-                $sub_total = $sub_total[0]->sub_total;
-                
-                $payments = Payment::where([
-                    ['workorder_id', '=', $workOrder->workorder_id],
-                    ['received', '=', 1]
-                    ])
-                    ->sum('payment_amount');
-                    
-                    // dd($sub_total - $payments);
-                    
-                    // WorkOrder Parts
-                    $wo_parts = WorkorderPart::where('workorder_id', '=', $workOrder->workorder_id)
-                    ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
-                    ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')
-                    ->paginate(10);
-                    $parts_list = Part::select('name', 'part_id')->get();
-                    
-                    // WorkOrder Labors
-                    $wo_labors = WorkorderLabor::where('workorder_id', '=', $workOrder->workorder_id)
-                    ->join('employee', 'employee.employee_id', '=', 'workorder_labor.employee_id')
-                    ->select('workorder_labor.wo_labor_id', 'workorder_labor.employee_id', 'workorder_labor.billable_hours', 'workorder_labor.hourly_rate', 'workorder_labor.comments', 'employee.first_name', 'employee.last_name')
-                    ->paginate(10);
-                    $employee_list = Employee::select('employee_id', 'first_name', 'last_name')->get();
-                    
-                    // WorkOrder Payments
-                    $wo_payments = Payment::where('workorder_id', '=', $workOrder->workorder_id)
-                    ->join('payment_method', 'payment_method.payment_method_id', '=', 'payment.payment_method_id')
-                    ->select('payment.payment_id', 'payment.payment_method_id', 'payment.payment_date', 'payment.payment_amount', 'payment.bank_name', 'payment.cheque_num', 'payment.cheque_date', 'payment.cheque_amount', 'payment.received', 'payment_method.name')
-                    ->paginate(10);
-                    $payment_method_list = PaymentMethod::select('payment_method_id', 'name')->get();
-                    // dd($wo_payments);
-                    
-                    $workorder_id = (isset($workOrder) ? $workOrder->workorder_id : '');
-                    $date_received = (isset($workOrder) ? Carbon::parse($workOrder->date_received)->format('d-m-Y') : '');
-                    $po_num = (isset($workOrder) ? $workOrder->po_num : '');
-                    $reference_num = (isset($workOrder) ? $workOrder->reference_num : '');
-                    $branch = (isset($workOrder) ? $workOrder->branch : '');
-                    $woCountry = (isset($workOrder) ? $workOrder->country : '');
-                    $serial_num = (isset($workOrder) ? $workOrder->serial_num : '');
-                    $problem_desc = (isset($workOrder) ? $workOrder->problem_desc : '');
-                    $date_delivered = (isset($workOrder) ? Carbon::parse($workOrder->date_delivered)->format('d-m-Y') : '');
-                    $hardcopy_delivered = (isset($workOrder) ? $workOrder->hardcopy_delivered : '');
-                    $contact_person = (isset($workOrder) ? $workOrder->child_id : '');
-                    $report_name = (isset($workOrder) ? $workOrder->report_name : '');
-                    $vendor_id = (isset($workOrder) ? $workOrder->vendor_id : '');
-                    $discount = (isset($workOrder) ? $workOrder->discount : '');
-                    $sales_tax_rate = (isset($workOrder) ? $workOrder->sales_tax_rate : '');
-                    $financial = (isset($workOrder) ? $workOrder->financial : '');
-                    
-                    $woBilling_address = (isset($customer_address) ? $customer_address->billing_address_id : '');
-                    $postal_address = (isset($customer_address) ? $customer_address->postal_address : '');
-                    $company_id = (isset($customer_address) ? $customer_address->company_id : '');
-                    
-                    $amount_due = $sub_total - $payments;
-                    $sales_tax = $sub_total*$sales_tax_rate/100;
-                    $order_total = $sub_total+$sales_tax;
-                    $amount_due += $sales_tax;
-                    
-                    $sub_total = ($sub_total == 0 ? '0.00' : number_format($sub_total, 2, '.', ','));
-                    $sales_tax = ($sales_tax == 0 ? '0.00' : number_format($sales_tax, 2, '.', ','));
-                    $order_total = ($order_total == 0 ? '0.00' : number_format($order_total, 2, '.', ','));
-                    $payments = ($payments == 0 ? '0.00' : number_format($payments, 2, '.', ','));
-                    $amount_due = ($amount_due == 0 ? '0.00' : number_format($amount_due, 2, '.', ','));
-                    
-                    $workorder_parts = (isset($wo_parts) ? $wo_parts : '');
-                    
-                    $workorder_labors = (isset($wo_labors) ? $wo_labors : '');
-                    
-                    $workorder_payments = (isset($wo_payments) ? $wo_payments : '');
-                    
-                    $all_billing_address = CustomerParent::where('company_id', '=', $company_id)
-                    ->join('billing_address', 'billing_address.billing_address_id', '=', 'customer_parent.billing_address_id')
-                    ->select('billing_address.billing_address_id', 'billing_address.name')->get();
-                    
-                    return view('workorders.update', [
-                        'company' => $company,
-                        'vendor' => $vendor,
-                        'workorder_id' => $workorder_id,
-                        'date_received' => $date_received,
+                if($new_workorder && $new_workorder != -1) {
+                    $po_num = $new_workorder-1000;
+                    Workorder::where('workorder_id', '=', $new_workorder)
+                    ->update([
                         'po_num' => $po_num,
-                        'reference_num' => $reference_num,
-                        'branch' => $branch,
-                        'woCountry' => $woCountry,
-                        'countries' => $countries,
-                        'woBilling_address' => $woBilling_address,
-                        'all_billing_address' => $all_billing_address,
-                        'serial_num' => $serial_num,
-                        'problem_desc' => $problem_desc,
-                        'date_delivered' => $date_delivered,
-                        'hardcopy_delivered' => $hardcopy_delivered,
-                        'contact_person' => $contact_person,
-                        'customer_info' => $customer_info,
-                        'postal_address' => $postal_address,
-                        'company_id' => $company_id,
-                        'report_name' => $report_name,
-                        'vendor_id' => $vendor_id,
-                        'financial' => $financial,
-                        'discount' => $discount,
-                        'sales_tax_rate' => $sales_tax_rate,
-                        'sub_total' => $sub_total,
-                        'sales_tax' => $sales_tax,
-                        'order_total' => $order_total,
-                        'payments' => $payments,
-                        'amount_due' => $amount_due,
-                        
-                        'workorder_parts' => $workorder_parts,
-                        'parts_list' => $parts_list,
-                        
-                        'workorder_labors' => $workorder_labors,
-                        'employee_list' => $employee_list,
-                        
-                        'workorder_payments' => $workorder_payments,
-                        'payment_method_list' => $payment_method_list
-                        
                     ]);
                 }
-                public function updateWorkorder(Request $request, $workorder_id) {
-                    // dd($request);
-                    // $request->validate([
-                        //     'username' => 'required', 
-                        //     'password' => 'required',
-                        // ]);
+                
+                return Redirect::to(url('/workorders/workorder/'.$new_workorder.'#step-workorder'))->with('message', 'Workorder created successfully!');
+            }
+            
+            public function editWorkorder($workorder_id) {
+                $workOrder = Workorder::where('workorder_id', '=', $workorder_id)->first();
+                
+                $customer_address = CustomerParent::where('customer_id', '=', $workOrder->customer_id)->first();
+                
+                $customer_info = CustomerChild::where([
+                    ['customer_id', '=', $workOrder->customer_id],
+                    ['active', '=', 1]
+                    ])->get();
+                    
+                    $countries = Country::all();
+                    
+                    $company = Company::get();
+                    
+                    $vendor = Vendor::get();
+                    
+                    $sql = "select sum(p.quantity*p.unit_price) as sub_total from workorder_part p, part pa where p.workorder_id=$workOrder->workorder_id and p.part_id=pa.part_id";
+                    $sub_total = DB::select($sql);
+                    $sub_total = $sub_total[0]->sub_total;
+                    
+                    $payments = Payment::where([
+                        ['workorder_id', '=', $workOrder->workorder_id],
+                        ['received', '=', 1]
+                        ])
+                        ->sum('payment_amount');
+                        
+                        // dd($sub_total - $payments);
+                        
+                        // WorkOrder Parts
+                        $wo_parts = WorkorderPart::where('workorder_id', '=', $workOrder->workorder_id)
+                        ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
+                        ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')
+                        ->paginate(10);
+                        $parts_list = Part::select('name', 'part_id')->get();
+                        
+                        // WorkOrder Labors
+                        $wo_labors = WorkorderLabor::where('workorder_id', '=', $workOrder->workorder_id)
+                        ->join('employee', 'employee.employee_id', '=', 'workorder_labor.employee_id')
+                        ->select('workorder_labor.wo_labor_id', 'workorder_labor.employee_id', 'workorder_labor.billable_hours', 'workorder_labor.hourly_rate', 'workorder_labor.comments', 'employee.first_name', 'employee.last_name')
+                        ->paginate(10);
+                        $employee_list = Employee::select('employee_id', 'first_name', 'last_name')->get();
+                        
+                        // WorkOrder Payments
+                        $wo_payments = Payment::where('workorder_id', '=', $workOrder->workorder_id)
+                        ->join('payment_method', 'payment_method.payment_method_id', '=', 'payment.payment_method_id')
+                        ->select('payment.payment_id', 'payment.payment_method_id', 'payment.payment_date', 'payment.payment_amount', 'payment.bank_name', 'payment.cheque_num', 'payment.cheque_date', 'payment.cheque_amount', 'payment.received', 'payment_method.name')
+                        ->paginate(10);
+                        $payment_method_list = PaymentMethod::select('payment_method_id', 'name')->get();
+                        // dd($wo_payments);
+                        
+                        $workorder_id = (isset($workOrder) ? $workOrder->workorder_id : '');
+                        $date_received = (isset($workOrder) ? Carbon::parse($workOrder->date_received)->format('d-m-Y') : '');
+                        $po_num = (isset($workOrder) ? $workOrder->po_num : '');
+                        $reference_num = (isset($workOrder) ? $workOrder->reference_num : '');
+                        $branch = (isset($workOrder) ? $workOrder->branch : '');
+                        $woCountry = (isset($workOrder) ? $workOrder->country : '');
+                        $serial_num = (isset($workOrder) ? $workOrder->serial_num : '');
+                        $problem_desc = (isset($workOrder) ? $workOrder->problem_desc : '');
+                        $date_delivered = (isset($workOrder) ? Carbon::parse($workOrder->date_delivered)->format('d-m-Y') : '');
+                        $hardcopy_delivered = (isset($workOrder) ? $workOrder->hardcopy_delivered : '');
+                        $contact_person = (isset($workOrder) ? $workOrder->child_id : '');
+                        $report_name = (isset($workOrder) ? $workOrder->report_name : '');
+                        $vendor_id = (isset($workOrder) ? $workOrder->vendor_id : '');
+                        $discount = (isset($workOrder) ? $workOrder->discount : '');
+                        $sales_tax_rate = (isset($workOrder) ? $workOrder->sales_tax_rate : '');
+                        $financial = (isset($workOrder) ? $workOrder->financial : '');
+                        
+                        $woBilling_address = (isset($customer_address) ? $customer_address->billing_address_id : '');
+                        $postal_address = (isset($customer_address) ? $customer_address->postal_address : '');
+                        $company_id = (isset($customer_address) ? $customer_address->company_id : '');
+                        
+                        $amount_due = $sub_total - $payments;
+                        $sales_tax = $sub_total*$sales_tax_rate/100;
+                        $order_total = $sub_total+$sales_tax;
+                        $amount_due += $sales_tax;
+                        
+                        $sub_total = ($sub_total == 0 ? '0.00' : number_format($sub_total, 2, '.', ','));
+                        $sales_tax = ($sales_tax == 0 ? '0.00' : number_format($sales_tax, 2, '.', ','));
+                        $order_total = ($order_total == 0 ? '0.00' : number_format($order_total, 2, '.', ','));
+                        $payments = ($payments == 0 ? '0.00' : number_format($payments, 2, '.', ','));
+                        $amount_due = ($amount_due == 0 ? '0.00' : number_format($amount_due, 2, '.', ','));
+                        
+                        $workorder_parts = (isset($wo_parts) ? $wo_parts : '');
+                        
+                        $workorder_labors = (isset($wo_labors) ? $wo_labors : '');
+                        
+                        $workorder_payments = (isset($wo_payments) ? $wo_payments : '');
+                        
+                        $all_billing_address = CustomerParent::where('company_id', '=', $company_id)
+                        ->join('billing_address', 'billing_address.billing_address_id', '=', 'customer_parent.billing_address_id')
+                        ->select('billing_address.billing_address_id', 'billing_address.name')->get();
+                        
+                        return view('workorders.update', [
+                            'company' => $company,
+                            'vendor' => $vendor,
+                            'workorder_id' => $workorder_id,
+                            'date_received' => $date_received,
+                            'po_num' => $po_num,
+                            'reference_num' => $reference_num,
+                            'branch' => $branch,
+                            'woCountry' => $woCountry,
+                            'countries' => $countries,
+                            'woBilling_address' => $woBilling_address,
+                            'all_billing_address' => $all_billing_address,
+                            'serial_num' => $serial_num,
+                            'problem_desc' => $problem_desc,
+                            'date_delivered' => $date_delivered,
+                            'hardcopy_delivered' => $hardcopy_delivered,
+                            'contact_person' => $contact_person,
+                            'customer_info' => $customer_info,
+                            'postal_address' => $postal_address,
+                            'company_id' => $company_id,
+                            'report_name' => $report_name,
+                            'vendor_id' => $vendor_id,
+                            'financial' => $financial,
+                            'discount' => $discount,
+                            'sales_tax_rate' => $sales_tax_rate,
+                            'sub_total' => $sub_total,
+                            'sales_tax' => $sales_tax,
+                            'order_total' => $order_total,
+                            'payments' => $payments,
+                            'amount_due' => $amount_due,
+                            
+                            'workorder_parts' => $workorder_parts,
+                            'parts_list' => $parts_list,
+                            
+                            'workorder_labors' => $workorder_labors,
+                            'employee_list' => $employee_list,
+                            
+                            'workorder_payments' => $workorder_payments,
+                            'payment_method_list' => $payment_method_list
+                            
+                        ]);
+                    }
+                    public function updateWorkorder(Request $request, $workorder_id) {
                         
                         $workOrder = Workorder::where('workorder_id', '=', $workorder_id)->first();
                         
@@ -360,26 +411,32 @@ class WorkOrderController extends Controller
                             ->join('customer_child', 'customer_child.customer_id', '=', 'customer_parent.customer_id')
                             ->select('customer_child.child_id', 'customer_child.first_name', 'customer_child.last_name')->get();
                             
-                            return response()->json(['response'=> $company_persons], 200);
-                        }
-                        public function getCompanyHistory() {
-                            $wo_company_id = $_GET['wo_company_id'];
-                            $wo_billing_address_id = $_GET['wo_billing_address_id'];
-                            
-                            $company_history = CustomerParent::where([
+                            $postal_address = CustomerParent::where([
                                 ['company_id', '=', $wo_company_id],
                                 ['billing_address_id', '=', $wo_billing_address_id]
                                 ])
-                                ->join('workorder', 'workorder.customer_id', '=', 'customer_parent.customer_id')
-                                ->select('workorder.po_num', 'workorder.report_name', DB::raw('DATE_FORMAT(workorder.date_received, "%d-%m-%Y") as date_received'), DB::raw('DATE_FORMAT(workorder.date_delivered, "%d-%m-%Y") as date_delivered'))->get();
+                                ->select('postal_address')->first();
                                 
-                                $company_name = Company::where('company_id', '=', $wo_company_id)->select('name')->first();
+                                return response()->json(['response'=> $company_persons, $postal_address], 200);
+                            }
+                            public function getCompanyHistory() {
+                                $wo_company_id = $_GET['wo_company_id'];
+                                $wo_billing_address_id = $_GET['wo_billing_address_id'];
                                 
-                                return response()->json(array(
-                                    'response' => $company_history,
-                                    'company_name' => $company_name
-                                ), 200);
+                                $company_history = CustomerParent::where([
+                                    ['company_id', '=', $wo_company_id],
+                                    ['billing_address_id', '=', $wo_billing_address_id]
+                                    ])
+                                    ->join('workorder', 'workorder.customer_id', '=', 'customer_parent.customer_id')
+                                    ->select('workorder.po_num', 'workorder.report_name', DB::raw('DATE_FORMAT(workorder.date_received, "%d-%m-%Y") as date_received'), DB::raw('DATE_FORMAT(workorder.date_delivered, "%d-%m-%Y") as date_delivered'))->get();
+                                    
+                                    $company_name = Company::where('company_id', '=', $wo_company_id)->select('name')->first();
+                                    
+                                    return response()->json(array(
+                                        'response' => $company_history,
+                                        'company_name' => $company_name
+                                    ), 200);
+                                }
+                                
                             }
                             
-                        }
-                        

@@ -14,6 +14,7 @@ class CustomerParent extends Model
     protected $fillable = [
         'billing_address',
         'company_id',
-        'postal_address'
+        'postal_address',
+        'province'
     ];
 }

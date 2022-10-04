@@ -22,6 +22,11 @@
   input[readonly] {
     cursor: not-allowed;
   }
+  #step-report .dropzone {
+    max-width: unset;
+    min-height: unset;
+    width: 100%;
+  }
 </style>
 
 @endsection
@@ -324,7 +329,7 @@
                       <div class="col-sm-9 offset-sm-3">
                         <div class="d-flex align-items-center">
                           <label class="custom-checkbox position-relative mr-2">
-                            <input type="checkbox" id="taxable_invoice" {{ $sales_tax_rate > 0 ? 'checked' : '' }}>
+                            <input type="checkbox" id="taxable_invoice" name="taxable" {{ $sales_tax_rate > 0 ? 'checked' : '' }}>
                             <span class="checkmark"></span>
                           </label>
                           <label for="taxable_invoice">Taxable Invoice</label>
@@ -564,7 +569,7 @@
                   </form>
                   <!-- Dropzone End -->
                 </div>
-                <div class="col-">
+                <div class="col-12">
                   
                 </div>
               </div>
@@ -1260,6 +1265,7 @@
               );
               $('#wo_contact_person').append(newOption).trigger('change');
             });
+            $('#postal_address').text(data[0].postal_address);
           }
         });
       }
@@ -1324,22 +1330,7 @@
       });
     });
     
-    // $('#step-parts-btn').click(function() {
-      //   console.log($('#workorder_id').val());
-      //   $.ajax({
-        //     type:'GET',
-        //     url:'/get-workorder-products',
-        //     data: {
-          //       workorder_id: $('#workorder_id').val(),
-          //     },
-          //     success:function(data) {
-            //       // parent.find(".get-unit_price").val(data.msg[0]['unit_price']);
-            //       // $('#wo_products_qty').val(1);
-            //       console.log(data.msg[0]['unit_price']);
-            //     }
-            //   });
-            // });
-            
-          });
-        </script>
-        @endsection
+    
+  });
+</script>
+@endsection

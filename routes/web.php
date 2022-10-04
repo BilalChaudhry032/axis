@@ -47,6 +47,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
 
         // *** Routes for Workorder CREATE and related items -Start- ***
         Route::get('/workorders/create', [WorkOrderController::class, 'createWorkorder']);
+        Route::post('/workorders/store', [WorkOrderController::class, 'storeWorkorder']);
         // *** Routes for Workorder CREATE and related items -End- ***
 
         // *** Routes for Workorder UPDATE and related items -Start- ***
@@ -54,10 +55,6 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::put('/workorders/workorder/{workorder_id}', [WorkOrderController::class, 'updateWorkorder']);
         Route::get('/get-company-addresses', [WorkOrderController::class, 'getCompanyAddresses']);//AJAX
         Route::get('/get-company-persons', [WorkOrderController::class, 'getCompanyPersons']);//AJAX
-        // Route::get('/workorders/parts/{workorder_id}', [WorkOrderController::class, 'editParts']);
-
-        // Route::get('/get-workorder-products', [WorkOrderController::class, 'storeParts']);
-        // Route::get('/workorders/{workorder_id}/parts', [WorkOrderController::class, 'showParts']);
 
         Route::post('/workorders/parts', [WorkOrderController::class, 'storeParts']);
         Route::put('/workorders/part/{wo_part_id}', [WorkOrderController::class, 'updateParts']);

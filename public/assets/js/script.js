@@ -478,6 +478,18 @@ $(function () {
             // Add a leading zero to the hours value
             $("#hours").html(( hours < 10 ? "0" : "" ) + hours);
         }, 1000);
+
+        setInterval( function() {
+            // Create a newDate() object and extract the hours of the current time on the visitor's
+            var hours = new Date().getHours();
+            var minutes = new Date().getMinutes();
+            var ampm = hours >= 12 ? '<small>pm</small>' : '<small>am</small>';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            minutes = minutes < 10 ? '0'+minutes : minutes;
+            var strTime = hours + ' : ' + minutes + ' ' + ampm;
+            $("#time-12h").html(strTime);
+        }, 1000);
             
     });
 

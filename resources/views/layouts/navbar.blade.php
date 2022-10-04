@@ -32,10 +32,11 @@
                      <li class="d-none d-lg-flex">
                         <!-- Main Header Time -->
                         <div class="main-header-date-time text-right">
-                           <h3 class="time">
-                              <span id="hours">21</span>
+                           <h3 class="time text-transform-none">
+                              {{-- <span id="hours">21</span>
                               <span id="point">:</span>
-                              <span id="min">06</span>
+                              <span id="min">06</span> --}}
+                              <span id="time-12h">12 : 00</span>
                            </h3>
                            <span class="date"><span id="date">Tue, 12 October 2019</span></span>
                         </div>
@@ -43,7 +44,7 @@
                      </li>
                      @if(isset($AuthUser))
                         <li class="ml-5">
-                           <span>Welcome, {{ $AuthUser->name }} | <a href="{{ url('/logout') }}">Logout</a></span>
+                           <span>Welcome, {{ $AuthUser['uname'] }} | <a href="{{ url('/logout') }}">Logout</a></span>
                         </li>
                      @endif
                   </ul>
