@@ -12428,3 +12428,28 @@ table td {
 .datepickers-container {
   z-index: 9999;
 }
+
+.ax-btn-link {
+  display: block;
+  width: 100%;
+  padding: 4px 16px;
+  clear: both;
+  font-weight: 400;
+  text-transform: capitalize;
+  margin-bottom: 5px;
+  color: #333333;
+  font-size: 14px;
+  -webkit-appearance: unset;
+  background: unset;
+  text-align: left;
+}
+.ax-btn-link:hover {
+  color: #8280FD;
+}
+
+.dataTables_wrapper {
+    padding: 30px;
+}
+div.dataTables_wrapper div.dataTables_filter input {
+    width: 320px;
+}

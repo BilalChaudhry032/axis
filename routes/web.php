@@ -26,6 +26,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::post('/vendor', [VendorController::class, 'store']);
     Route::put('/vendor/{vendor_id}', [VendorController::class, 'update']);
     Route::delete('/vendor/{vendor_id}', [VendorController::class, 'destroy']);
+    Route::get('/search-vendor', [VendorController::class, 'searchVendor']);//AJAX
 
     Route::get('/company', [CompanyController::class, 'index'])->name('company');
     Route::post('/company', [CompanyController::class, 'store']);
@@ -44,6 +45,9 @@ Route::middleware([AuthMiddleware::class])->group(function () {
 
     // *** Routes for Workorders -Start- ***
     Route::get('/workorders', [WorkOrderController::class, 'index'])->name('workorders');
+
+        Route::put('/workorder/{workorder_id}/archived', [WorkOrderController::class, 'archiveWorkorder']);
+        Route::put('/workorder/{workorder_id}/cancelled', [WorkOrderController::class, 'cancelWorkorder']);
 
         // *** Routes for Workorder CREATE and related items -Start- ***
         Route::get('/workorders/create', [WorkOrderController::class, 'createWorkorder']);

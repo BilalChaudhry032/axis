@@ -38,7 +38,7 @@
             </div>
          </div>
          <div class="table-responsive">
-            <table class="text-nowrap invoice-list">
+            <table class="text-nowrap " id="table">
                <thead>
                   <tr>
                      <th>
@@ -70,7 +70,7 @@
                            <span class="checkmark"></span>
                         </label>
                         <!-- End Custom Checkbox --> --}}
-                        {{ (($workOrders->currentPage() -1) * $workOrders->perPage()) + $loop->index + 1 }}
+                        {{-- {{ (($workOrders->currentPage() -1) * $workOrders->perPage()) + $loop->index + 1 }} --}}
                      </td>
                      <td>{{ $workOrder->name }}</td>
                      <td>{{ $workOrder->workorder_id }}</td>
@@ -90,8 +90,16 @@
                            </a>
                            <div class="dropdown-menu dropdown-menu-right">
                               <a href="{{ url('/workorders/workorder/'.$workOrder->workorder_id) }}">Edit</a>
-                              <a href="#">Cancel</a>
-                              <a href="#">Archive</a>
+                              <form action="{{ url('/workorder/'.$workOrder->workorder_id.'/cancelled') }}" method="POST">
+                                 @csrf
+                                 @method('PUT')
+                                 <button class="ax-btn-link" type="summit">Cancel</button>
+                              </form>
+                              <form action="{{ url('/workorder/'.$workOrder->workorder_id.'/archived') }}" method="POST">
+                                 @csrf
+                                 @method('PUT')
+                                 <button class="ax-btn-link" type="summit">Archive</button>
+                              </form>
                            </div>
                         </div>
                         <!-- End Dropdown Button -->
@@ -105,7 +113,36 @@
          </div>
       </div>
       
-      {!! $workOrders->links('pagination::bootstrap-5') !!}
+      {{-- {!! $workOrders->links('pagination::bootstrap-5') !!} --}}
    </div>
 </div>
+@endsection
+
+@section('pageScript')
+
+<script>
+   $(document).ready(function() {
+      
+      var t = $('#table').DataTable({
+         columnDefs: [
+         {
+            searchable: false,
+            orderable: false,
+            targets: 0,
+         },
+         ],
+         order: [[1, 'asc']],
+      });
+      
+      t.on('order.dt search.dt', function () {
+         let i = 1;
+         
+         t.cells(null, 0, { search: 'applied', order: 'applied' }).every(function (cell) {
+            this.data(i++);
+         });
+      }).draw();
+      
+   });
+</script>
+
 @endsection

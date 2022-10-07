@@ -24,6 +24,8 @@
    <link rel="stylesheet" href="{{ asset('assets/plugins/perfect-scrollbar/perfect-scrollbar.min.css') }}">
    <!-- ======= END BEGIN GLOBAL MANDATORY STYLES ======= -->
 
+   <link rel="stylesheet" href="{{ asset('assets/plugins/dataTables/dataTables.bootstrap4.min.css') }}">
+
    <!-- ======= BEGIN PAGE LEVEL PLUGINS STYLES ======= -->
    @yield('pageCSS')
    <!-- ======= END BEGIN PAGE LEVEL PLUGINS STYLES ======= -->
@@ -90,6 +92,9 @@
    <script src="{{ asset('assets/plugins/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
    <script src="{{ asset('assets/js/script.js') }}"></script>
    <!-- ======= BEGIN GLOBAL MANDATORY SCRIPTS ======= -->
+
+   <script src="{{ asset('assets/plugins/dataTables/jquery.dataTables.min.js') }}"></script>
+   <script src="{{ asset('assets/plugins/dataTables/dataTables.bootstrap4.min.js') }}"></script>
 
    <!-- ======= BEGIN PAGE LEVEL PLUGINS/CUSTOM SCRIPTS ======= -->
    @yield('pageScript')
