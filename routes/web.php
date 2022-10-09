@@ -23,10 +23,13 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     });
 
     Route::get('/vendor', [VendorController::class, 'index'])->name('vendor');
+    Route::get('/vendor/list', [VendorController::class, 'getVendors'])->name('vendor.list');//AJAX
+    Route::get('/get-vendor', [VendorController::class, 'getVendor']);//AJAX
     Route::post('/vendor', [VendorController::class, 'store']);
     Route::put('/vendor/{vendor_id}', [VendorController::class, 'update']);
     Route::delete('/vendor/{vendor_id}', [VendorController::class, 'destroy']);
     Route::get('/search-vendor', [VendorController::class, 'searchVendor']);//AJAX
+    
 
     Route::get('/company', [CompanyController::class, 'index'])->name('company');
     Route::post('/company', [CompanyController::class, 'store']);
@@ -45,6 +48,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
 
     // *** Routes for Workorders -Start- ***
     Route::get('/workorders', [WorkOrderController::class, 'index'])->name('workorders');
+        Route::get('/workorders/list', [WorkOrderController::class, 'getWorkOrders'])->name('workorders.list');//AJAX
 
         Route::put('/workorder/{workorder_id}/archived', [WorkOrderController::class, 'archiveWorkorder']);
         Route::put('/workorder/{workorder_id}/cancelled', [WorkOrderController::class, 'cancelWorkorder']);

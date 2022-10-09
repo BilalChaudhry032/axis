@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "41605ba23bf4a8fec24829e159113fb1",
+    "content-hash": "750c55a4950268d60d594f835fa24213",
     "packages": [
         {
             "name": "brick/math",
@@ -1341,6 +1341,10 @@
             ],
             "description": "HTML and Form Builders for the Laravel Framework",
             "homepage": "https://laravelcollective.com",
+            "support": {
+                "issues": "https://github.com/LaravelCollective/html/issues",
+                "source": "https://github.com/LaravelCollective/html"
+            },
             "time": "2022-02-08T21:02:54+00:00"
         },
         {
@@ -1686,6 +1690,10 @@
                 "league",
                 "rest"
             ],
+            "support": {
+                "issues": "https://github.com/thephpleague/fractal/issues",
+                "source": "https://github.com/thephpleague/fractal/tree/0.20.1"
+            },
             "time": "2022-04-11T12:47:17+00:00"
         },
         {
@@ -5381,6 +5389,10 @@
                 "jquery",
                 "laravel"
             ],
+            "support": {
+                "issues": "https://github.com/yajra/datatables/issues",
+                "source": "https://github.com/yajra/datatables/tree/v9.0.0"
+            },
             "time": "2022-05-07T16:41:24+00:00"
         },
         {
@@ -5449,6 +5461,10 @@
                 "jquery",
                 "laravel"
             ],
+            "support": {
+                "issues": "https://github.com/yajra/laravel-datatables-buttons/issues",
+                "source": "https://github.com/yajra/laravel-datatables-buttons/tree/v9.1.1"
+            },
             "funding": [
                 {
                     "url": "https://www.paypal.me/yajra",
@@ -5520,6 +5536,10 @@
                 "jquery",
                 "laravel"
             ],
+            "support": {
+                "issues": "https://github.com/yajra/laravel-datatables-editor/issues",
+                "source": "https://github.com/yajra/laravel-datatables-editor/tree/v1.25.1"
+            },
             "funding": [
                 {
                     "url": "https://www.paypal.me/yajra",
@@ -5588,6 +5608,10 @@
                 "fractal",
                 "laravel"
             ],
+            "support": {
+                "issues": "https://github.com/yajra/laravel-datatables-fractal/issues",
+                "source": "https://github.com/yajra/laravel-datatables-fractal/tree/v9.1.0"
+            },
             "time": "2022-06-20T01:43:31+00:00"
         },
         {
@@ -5648,6 +5672,10 @@
                 "jquery",
                 "laravel"
             ],
+            "support": {
+                "issues": "https://github.com/yajra/laravel-datatables-html/issues",
+                "source": "https://github.com/yajra/laravel-datatables-html/tree/v9.3.4"
+            },
             "funding": [
                 {
                     "url": "https://www.paypal.me/yajra",
@@ -5731,6 +5759,10 @@
                 "jquery",
                 "laravel"
             ],
+            "support": {
+                "issues": "https://github.com/yajra/laravel-datatables/issues",
+                "source": "https://github.com/yajra/laravel-datatables/tree/v10.1.5"
+            },
             "funding": [
                 {
                     "url": "https://www.paypal.me/yajra",
@@ -8200,5 +8232,5 @@
         "php": "^8.0.2"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.3.0"
 }

@@ -67,7 +67,7 @@
          <!-- End Sidebar -->
 
          <!-- Main Content -->
-         <div class="main-content" style="min-height: calc(100vh - 160px); margin-top: 90px;">
+         <div class="main-content" style="min-height: calc(100vh - 160px); margin-top: 80px;">
             <div class="container-fluid">
                @yield('content')
             </div>
@@ -77,9 +77,9 @@
       <!-- End Main Wrapper -->
 
       <!-- Footer -->
-      <footer class="footer">
-         {{-- Dashmin © 2020 created by <a href="https://www.themelooks.com/"> ThemeLooks</a> --}}
-      </footer>
+      {{-- <footer class="footer">
+         Dashmin © 2020 created by <a href="https://www.themelooks.com/"> ThemeLooks</a>
+      </footer> --}}
       <!-- End Footer -->
    </div>
    <!-- End wrapper -->

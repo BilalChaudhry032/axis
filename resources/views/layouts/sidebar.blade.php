@@ -2,9 +2,9 @@
    <!-- Sidebar Header -->
    <div class="sidebar-header d-none d-lg-block">
       <!-- Sidebar Toggle Pin Button -->
-      <div class="sidebar-toogle-pin">
+      {{-- <div class="sidebar-toogle-pin">
          <i class="icofont-tack-pin"></i>
-      </div>
+      </div> --}}
       <!-- End Sidebar Toggle Pin Button -->
    </div>
    <!-- End Sidebar Header -->

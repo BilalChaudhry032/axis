@@ -21,31 +21,73 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\URL;
+use Yajra\DataTables\DataTables;
 
 class WorkOrderController extends Controller
 {
-    public function index() {
+    public function index(Request $request) {
+
+        // $workOrders = Workorder::where([
+        //         ['cancelled', '=', 0],
+        //         ['archived', '=', 0]
+        //     ])
+        //     ->orderByDesc('workorder_id')
+        //     ->join('customer_parent', 'workorder.customer_id', '=', 'customer_parent.customer_id')
+        //     ->join('company', 'customer_parent.company_id', "=", "company.company_id")
+        //     ->select("workorder.*", DB::raw('DATE_FORMAT(workorder.date_received, "%d-%m-%Y") as date_received'), DB::raw('DATE_FORMAT(workorder.date_delivered, "%d-%m-%Y") as date_delivered'), "company.name");
         
-        $workOrders = Workorder::where([
-            ['cancelled', '=', 0],
-            ['archived', '=', 0]
-        ])
-        ->orderByDesc('workorder_id')
-        ->join('customer_parent', 'workorder.customer_id', '=', 'customer_parent.customer_id')
-        ->join('company', 'customer_parent.company_id', "=", "company.company_id")
-        ->select("workorder.*", "company.name")
-        // ->where('company.name', 'LIKE', "%".request('search')."%")
-        // ->orWhere('workorder_id', 'LIKE', "%".request('search')."%")
-        // ->orWhere('po_num', 'LIKE', "%".request('search')."%")
-        // ->orWhere('report_name', 'LIKE', "%".request('search')."%")
-        // ->orWhere('date_received', 'LIKE', "%".$_date."%")
-        // ->orWhere('date_delivered', 'LIKE', "%".$_date."%")
-        ->paginate(10);
-        // dd(DB::getQueryLog());
+        // if($request->ajax()) {
+        //     // dd($request->ajax());
+        //     $workOrders = $workOrders->where('company.name', 'LIKE', "%".request('search')."%")
+        //     ->orWhere('workorder_id', 'LIKE', "%".request('search')."%")
+        //     ->orWhere('po_num', 'LIKE', "%".request('search')."%")
+        //     ->orWhere('report_name', 'LIKE', "%".request('search')."%");
+        //     $workOrders = $workOrders->paginate(10);
+        //     // ->orWhere('date_received', 'LIKE', "%".$_date."%")
+        //     // ->orWhere('date_delivered', 'LIKE', "%".$_date."%")
+        //     return response()->json(['response'=> $workOrders], 200);
+        // }
+
+        // $workOrders = $workOrders->paginate(10);
         
         return view('workorders.index', [
-            'workOrders' => $workOrders
+            // 'workOrders' => $workOrders
         ]);
+    }
+
+    public function getWorkOrders(Request $request) {
+        if($request->ajax()) {
+            $workOrders = Workorder::where([
+                ['cancelled', '=', 0],
+                ['archived', '=', 0]
+            ])
+            ->orderByDesc('workorder_id')
+            ->join('customer_parent', 'workorder.customer_id', '=', 'customer_parent.customer_id')
+            ->join('company', 'customer_parent.company_id', "=", "company.company_id")
+            ->select("workorder.workorder_id", "workorder.po_num", "workorder.report_name", DB::raw('DATE_FORMAT(workorder.date_received, "%d-%m-%Y") as date_received'), DB::raw('DATE_FORMAT(workorder.date_delivered, "%d-%m-%Y") as date_delivered'), "company.name");
+            // dd($workOrders[0]);
+            return DataTables::of($workOrders)
+                ->addIndexColumn()
+                ->addColumn('action', function($row){
+                $actionBtn = '<div class="dropdown-button">
+                        <a href="#" class="d-flex align-items-center justify-content-end" data-toggle="dropdown">
+                            <div class="menu-icon mr-0">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a href="#" class="edit-workorder" id="edit_'.$row->workorder_id.'">Edit</a>
+                            <a href="#" class="cancel-workorder" id="cancel_'.$row->workorder_id.'">Cancel</a>
+                            <a href="#" class="archive-workorder" id="archive_'.$row->workorder_id.'">Archive</a>
+                        </div>
+                    </div>';
+                return $actionBtn;
+            })
+            ->rawColumns(['action'])
+            ->make(true);
+        }
     }
 
     public function archiveWorkorder($workorder_id) {

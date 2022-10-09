@@ -6005,7 +6005,7 @@ body.sidebar-folded.open-sidebar-folded .header .main-header {
 }
 
 .sidebar {
-  width: 260px;
+  width: 200px;
   height: calc(100% - 90px);
   position: fixed;
   left: 0;
@@ -6269,7 +6269,7 @@ body.sidebar-folded.open-sidebar-folded .footer {
 ********************* */
 .main-content {
   min-height: calc(100vh - 190px);
-  margin-left: 275px;
+  margin-left: 205px;
   position: relative;
   overflow: hidden;
   width: 100%;
