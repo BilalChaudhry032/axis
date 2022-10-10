@@ -36,8 +36,18 @@
 <div class="row">
   <div class="col-xl-12">
     <div class="card mb-30">
-      <h4 class="font-20 mb-30 mt-30 mx-4">Edit Workorder</h4>
       
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="title-content">
+            <h4 class="mb-2">Edit Workorder</h4>
+          </div>
+          <div>
+            <a href="#" type="button" class="btn btn-secondary px-3 py-2">Invoice</a>
+          </div>
+        </div>
+      </div>
+
       <div id="smartwizard">
         <ul class="nav">
           <li>
@@ -1272,8 +1282,6 @@
     });
     
     $('#step-history-btn').click(function() {
-      // console.log($('#wo_company_id').val()+' wo_company_id');
-      // console.log($('#wo_billing_address').val()+' wo_billing_address');
       var url = "{{url('/get-company-history')}}";
       $.ajax({
         type:'GET',

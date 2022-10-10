@@ -9,16 +9,7 @@ use Yajra\DataTables\DataTables;
 class VendorController extends Controller
 {
     public function index() {
-        // $vendors = Vendor::where('name', 'LIKE', "%".request('search')."%")
-        //     ->orderByDesc('vendor_id')
-        //     ->paginate(10);
-
-        // $vendors = Vendor::orderByDesc('vendor_id')->get();
-
-        return view('vendor.index', [
-            // 'vendors' => $vendors,
-            // 'search' => request('search')
-        ]);
+        return view('vendor.index');
     }
 
     public function getVendors(Request $request) {
@@ -75,11 +66,4 @@ class VendorController extends Controller
         return redirect()->back()->with('message', 'Vendor deleted successfully!');
     }
 
-    // public function searchVendor() {
-    //     $v_data = $_GET['v_data'];
-    //     $vendors = Vendor::where('name', 'LIKE', "%".$v_data."%")
-    //         ->orderByDesc('vendor_id')
-    //         ->get();
-    //     return response()->json(['response'=> $vendors], 200);
-    // }
 }

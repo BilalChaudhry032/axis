@@ -3,35 +3,12 @@
 <div class="row">
    <div class="col-xl-12">
       
-      {{-- <div class="card mb-30">
-         <div class="card-body">
-            <div class="d-flex justify-content-between">
-               <form action="{{ url('/vendor') }}" class="search-form flex-grow">
-                  <div class="theme-input-group style--two">
-                     <input type="text" class="theme-input-style" placeholder="Search Here" name="search" value="{{ $search }}">
-                     
-                     <button type="submit"><img src="{{ asset('/assets/img/svg/search-icon.svg') }}" alt="" class="svg"></button>
-                  </div>
-               </form>
-            </div>
-         </div>
-      </div> --}}
-      
       <div class="card mb-30">
          <div class="card-body pb-0">
             <div class="d-flex justify-content-between align-items-center">
                <div class="title-content">
                   <h4 class="mb-2">Vendor</h4>
                </div>
-               {{-- <div class="mb-2 w-50">
-                  <form action="{{ url('/vendor') }}" class="search-form flex-grow">
-                     <div class="theme-input-group style--two">
-                        <input type="text" class="theme-input-style" placeholder="Search Here" name="search" value="{{ $search }}" id="search-vendor">
-                        
-                        <button type="submit"><img src="{{ asset('/assets/img/svg/search-icon.svg') }}" alt="" class="svg"></button>
-                     </div>
-                  </form>
-               </div> --}}
                <div>
                   <a href="" data-toggle="modal" data-target="#vendor_create_modal" type="button" class="btn btn-secondary px-3 py-2">New Vendor</a>
                </div>
