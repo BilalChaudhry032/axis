@@ -95,7 +95,14 @@
         <img src="{{ asset('/assets/img/invoice-header.png') }}" width="100%"/>
         <div class="bottom-left">
          <h3 align="left">NTN #: 3512754-6</h3>
-         <h3 align="left">PRA#: P3512754-6</h3>
+         <h3 align="left">
+          @if($province == 'Punjab,' || $province == 'Punjab')
+           PRA#: P3512754-6
+          @elseif($province == 'Sindh' || $province == 'Sind')
+           SRB#: S3512754-6
+          @else
+          @endif
+         </h3>
         </div>
         <div class="centered1"><b>Invoice</b></div>
        </div>
@@ -110,7 +117,7 @@
         <td width="10%"><label class='heading8'>Inv. Date</label></td>
         <td width="10%"><label class='heading8'>{{ $date_delivered }}</label></td>
         <td width="13%"><label class='heading8'>Banker Name:</label></td>
-        <td width="38%"><label class='heading8'>{{ $contact_name }}</label></td>
+        <td width="38%"><label class='heading8'>{{ $last_name }}</label></td>
         <td width="10%"><label class='heading8'>Customer ID:</label></td>
         <td width="15%" align="right"><label class='heading8'>{{ $customer_id }}</label></td>
        </tr>
@@ -118,7 +125,7 @@
         <td width="10%"><label class='heading8'>Invoice #:</label></td>
         <td width="10%"><label class='heading8'>{{ $workorder_id }}</label></td>
         <td width="13%"><label class='heading8'>Contact Title:</label></td>
-        <td width="38%"><label class='heading8'>{{ $customer_title }}</label></td>
+        <td width="38%"><label class='heading8'>{{ $contact_title }}</label></td>
         <td width="10%"><label class='heading8'>Deliver Date:</label></td>
         <td width="15%" align="right"><label class='heading8'>{{ $date_delivered }}</label></td>
        </tr>
@@ -143,16 +150,16 @@
         <td colspan="3"><label class='heading10'><b>Report Name / Address</b></label></td>						
        </tr>
        <tr>
-        <td colspan="3"><label class='heading8'>{{ $company_name }}</label></td>
+        <td colspan="3"><label class='heading8'>{{ $cname }}</label></td>
         <td colspan="3"><label class='heading8'>{{ $report_name }}</label></td>						
        </tr>
        <tr>
-        <td colspan="3"><label class='heading8'>{{ $postal_address.' '.$postal_city }}</label></td>
+        <td colspan="3"><label class='heading8'>{{ $postal_address.' '.$city }}</label></td>
         <td colspan="3"><label class='heading8'>{{ $problem_desc }}</label></td>
        </tr>
        <tr>
-        <td colspan="3"><label class='heading8'>Tel: {{ $postal_telephone }} Ext: {{ $postal_extension }}</label></td>
-        <td colspan="3"><label class='heading8'>{{ $woCountry }}</label></td>
+        <td colspan="3"><label class='heading8'>Tel: {{ $telephone }} Ext: {{ $extension }}</label></td>
+        <td colspan="3"><label class='heading8'>{{ $country }}</label></td>
        </tr>
        <tr>
         <td colspan="3"><label class='heading8'>Direct: {{ $direct }}</label></td>
@@ -173,9 +180,19 @@
         <th width='10%' align='right'><label class='heading8'>Total Price</label></th>
        </tr>
 
-       @if ($wo_parts)
-       @foreach ($wo_parts as $wo_part)
-       <tr><td width='50%' align='left'><label class='heading8'>{{ $wo_part->name }}</label></td><td width='10%' align='left'><label class='heading8'>{{ $wo_part->quantity }}</label></td><td width='10%' align='left'><label class='heading8'>{{ $wo_part->us_price }}</label></td><td width='10%' align='left'><label class='heading8'>{{ $wo_part->exchange_rate }}</label></td><td width='10%' align='right'><label class='heading8'>{{ $wo_part->unit_price }}</label></td><td width='10%' align='right'><label class='heading8'>{{ $wo_part->unit_price * $wo_part->quantity }}</label></td></tr>			
+       @if ($products)
+       @foreach ($products as $product)
+       <tr>
+        <td width='50%' align='left'><label class='heading8'>{{ $product->name }}</label></td>
+        <td width='10%' align='left'><label class='heading8'>{{ $product->quantity }}</label></td>
+        <td width='10%' align='left'><label class='heading8'>{{ $product->us_price == 0 ? '0.00' : number_format($product->us_price, 2, '.', ',') }}</label></td>
+        <td width='10%' align='left'><label class='heading8'>{{ $product->exchange_rate == 0 ? '0.00' : number_format($product->exchange_rate, 2, '.', ',') }}</label></td>
+        <td width='10%' align='right'><label class='heading8'>{{ $product->unit_price == 0 ? '0.00' : number_format($product->unit_price, 2, '.', ',') }}</label></td>
+        @php
+         $total = $product->unit_price * $product->quantity;
+        @endphp
+        <td width='10%' align='right'><label class='heading8'>{{ $total == 0 ? '0.00' : number_format($total, 2, '.', ',') }}</label></td>
+       </tr>			
        @endforeach		
        @endif
        
