@@ -43,7 +43,7 @@
             <h4 class="mb-2">Edit Workorder</h4>
           </div>
           <div>
-            <a href="#" type="button" class="btn btn-secondary px-3 py-2">Invoice</a>
+            <a href="{{ url('/workorder/'.$workorder_id.'/invoice') }}" target="_blank" type="button" class="btn btn-secondary px-3 py-2">Invoice</a>
           </div>
         </div>
       </div>
@@ -1292,6 +1292,7 @@
         },
         success:function(data) {
           // console.log(data.response);
+          $('#history_wrap').empty();
           $(data.response).each(function(i) {
             $('#history_wrap').append(`
             <tr>

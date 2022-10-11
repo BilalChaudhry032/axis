@@ -7,6 +7,7 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BillingAddressController;
 use App\Http\Controllers\PartsController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,6 +29,9 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::post('/vendor', [VendorController::class, 'store']);
     Route::put('/vendor/{vendor_id}', [VendorController::class, 'update']);
     Route::delete('/vendor/{vendor_id}', [VendorController::class, 'destroy']);
+
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments');
+    Route::get('/payments/list', [PaymentController::class, 'getPayments'])->name('payments.list');//AJAX
 
     Route::get('/company', [CompanyController::class, 'index'])->name('company');
     Route::post('/company', [CompanyController::class, 'store']);
@@ -99,9 +103,5 @@ Route::get('/reports', function () {
 
 Route::get('/customers', function () {
     return view('Customers');
-});
-
-Route::get('/payments', function () {
-    return view('Payments');
 });
 

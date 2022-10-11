@@ -1,0 +1,103 @@
+body { background-color:white;}
+h3 {font-family: Tahoma;}
+h4 {font-family: Tahoma;}
+.label {
+	font-family: Tahoma;
+	font-size:9pt;
+}
+.outbox {
+	font-family: Tahoma;
+	font-size:11pt;
+	text-decoration:none;
+}
+.heading10 {
+	font-family: Tahoma;
+	font-size:10pt;
+	text-decoration:none;
+}
+.heading8 {
+	font-family: Tahoma;
+	font-size:8pt;
+	text-decoration:none;
+}
+.heading1 {
+	font-family: Tahoma;
+	font-size:12pt;
+	text-decoration:none;
+}
+.heading2 {
+	font-family: Tahoma;
+	font-size:16pt;
+	text-decoration:none;
+}
+.heading3 {
+	font-family: Tahoma;
+	font-size:36pt;
+	text-decoration:none;
+	font-weight:bold;
+}
+.bold {
+	font-family: Tahoma;
+	font-size:10pt;
+	font-weight:bold;
+}
+.h3 {
+	font-family: Tahoma;
+	font-size:16pt;
+	font-weight:bold;
+}
+.h4 {
+	font-family: Tahoma;
+	font-size:14pt;
+	font-weight:bold;
+}
+.demo_label {
+	font-family: Tahoma;
+	font-size:11pt;	
+	font-weight:bold;
+	color:red;
+}
+label.error { font-family: Tahoma; font-size:10pt;float: none; color: red; padding-left: .5em; vertical-align: top; }
+.red {
+	color:#C11B17;
+}
+.txtinput {
+	font-family:Tahoma;
+	font-size:9pt;
+	border: 1px solid #ADD8E6;
+}
+.txtcombo {
+	background-color:#D7E5F2;
+	font-family:Tahoma;
+	font-size:9pt;	
+	color:#000000;
+	border: 1px solid #000066;
+	width:160px;
+}
+.invalid {
+	font-family:Tahoma;
+	font-size:10pt;
+	background-color:yellow;		
+	border: 1px solid red;
+}
+.price_heading {
+	font-family: Tahoma;
+	font-size:25pt;
+}
+.bulk_table {
+	font-family: Tahoma;
+	font-size:11px;
+	color:#333333;
+	border: 1px #666666 solid;
+	border-collapse: collapse;
+}
+.bulk_table th {	
+	padding: 8px;	
+	border: 1px #666666 solid;
+	background-color: #dedede;
+}
+.bulk_table td {	
+	padding: 8px;	
+	border: 1px #666666 solid;
+	background-color: #ffffff;
+}

@@ -423,8 +423,98 @@ class WorkOrderController extends Controller
                             }
                             
                             public function workorderInvoice($workorder_id) {
+                                // dd($workorder_id);
+                                $workOrder = Workorder::where('workorder_id', '=', $workorder_id)->first();
 
-                                return view('reports.invoice', []);
+                                // WorkOrder Parts
+                                $wo_parts = WorkorderPart::where('workorder_id', '=', $workOrder->workorder_id)
+                                ->join('part', 'part.part_id', '=', 'workorder_part.part_id')
+                                ->select('workorder_part.wo_part_id', 'workorder_part.part_id', 'part.name', 'workorder_part.quantity', 'workorder_part.unit_price', 'workorder_part.us_price', 'workorder_part.exchange_rate')
+                                ->get();
+
+                                // dd($workOrder);
+                                $customer_address = CustomerParent::where('customer_id', '=', $workOrder->customer_id)->first();
+
+                                $company = Company::where('company_id', '=', $customer_address->company_id)->select('name')->first();
+                                
+                                $customer_info = CustomerChild::where([
+                                    ['child_id', '=', $workOrder->child_id],
+                                    ['active', '=', 1]
+                                    ])->first();
+                                // dd($customer_info);
+                                $sql = "select sum(p.quantity*p.unit_price) as sub_total from workorder_part p, part pa where p.workorder_id=$workOrder->workorder_id and p.part_id=pa.part_id";
+                                $sub_total = DB::select($sql);
+                                $sub_total = $sub_total[0]->sub_total;
+                                
+                                $payments = Payment::where([
+                                    ['workorder_id', '=', $workOrder->workorder_id],
+                                    ['received', '=', 1]
+                                    ])
+                                    ->sum('payment_amount');
+
+                                $workorder_id = (isset($workOrder) ? $workOrder->workorder_id : '');
+                                $date_received = (isset($workOrder) ? Carbon::parse($workOrder->date_received)->format('d-m-Y') : '');
+                                $po_num = (isset($workOrder) ? $workOrder->po_num : '');
+                                $reference_num = (isset($workOrder) ? $workOrder->reference_num : '');
+                                $woCountry = (isset($workOrder) ? $workOrder->country : '');
+                                $problem_desc = (isset($workOrder) ? $workOrder->problem_desc : '');
+                                $date_delivered = (isset($workOrder) ? Carbon::parse($workOrder->date_delivered)->format('d-m-Y') : '');
+                                $report_name = (isset($workOrder) ? $workOrder->report_name : '');
+                                $sales_tax_rate = (isset($workOrder) ? $workOrder->sales_tax_rate : '');
+                                $customer_id = (isset($workOrder) ? $workOrder->customer_id : '');
+                                
+                                $postal_address = (isset($customer_address) ? $customer_address->postal_address : '');
+                                $postal_city = (isset($customer_address) ? $customer_address->city : '');
+                                $postal_telephone = (isset($customer_address) ? $customer_address->telephone : '');
+                                $postal_extension = (isset($customer_address) ? $customer_address->extension : '');
+
+                                $company_name = (isset($company) ? $company->name : '');
+
+                                $customer_first_name = (isset($customer_info) ? $customer_info->first_name : '');
+                                $customer_last_name = (isset($customer_info) ? $customer_info->last_name : '');
+                                $customer_title = (isset($customer_info) ? $customer_info->contact_title : '');
+                                $direct = (isset($customer_info) ? $customer_info->direct : '');
+                                
+                                $amount_due = $sub_total - $payments;
+                                $sales_tax = $sub_total*$sales_tax_rate/100;
+                                $order_total = $sub_total+$sales_tax;
+                                $amount_due += $sales_tax;
+                                
+                                $sub_total = ($sub_total == 0 ? '0' : number_format($sub_total, 0));
+                                $sales_tax = ($sales_tax == 0 ? '0' : number_format($sales_tax, 0));
+                                $order_total = ($order_total == 0 ? '0' : number_format($order_total, 0));
+                                $payments = ($payments == 0 ? '0' : number_format($payments, 0));
+                                $amount_due = ($amount_due == 0 ? '0' : number_format($amount_due, 0));
+
+                                return view('reports.invoice', [
+                                    'date_delivered' => $date_delivered,
+                                    'contact_name' => $customer_first_name.' '.$customer_last_name,
+                                    'customer_id' => $customer_id,
+                                    'workorder_id' => $workorder_id,
+                                    'customer_title' => $customer_title,
+                                    'date_received' => $date_received,
+                                    'po_num' => $po_num,
+
+                                    'company_name' => $company_name,
+                                    'postal_address' => $postal_address,
+                                    'postal_city' => $postal_city,
+                                    'postal_telephone' => $postal_telephone,
+                                    'postal_extension' => $postal_extension,
+                                    'woCountry' => $woCountry,
+                                    'reference_num' => $reference_num,
+                                    'problem_desc' => $problem_desc,
+                                    'direct' => $direct,
+                                    'report_name' => $report_name,
+
+                                    'wo_parts' => $wo_parts,
+
+                                    'sub_total' => $sub_total,
+                                    'sales_tax_rate' => $sales_tax_rate,
+                                    'sales_tax' => $sales_tax,
+                                    'order_total' => $order_total,
+                                    'payments' => $payments,
+
+                                ]);
                             }
                             
                             // AJAX Functions
