@@ -1186,7 +1186,7 @@
         </div>
         <div class="modal-footer">
           <button type="reset" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Add Labor</button>
+          <button type="submit" class="btn btn-primary">Add Payment</button>
         </div>
       </form>
     </div>
