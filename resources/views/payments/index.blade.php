@@ -25,7 +25,7 @@
             <table class="" id="payments_table">
                <thead>
                   <tr>
-                     <th>SR#</th>
+                     {{-- <th>SR#</th> --}}
                      <th>Invoice#</th>
                      <th>Invoice Amount</th>
                      <th>Payment Method</th>
@@ -69,19 +69,19 @@
                   <div class="col-sm-6">
                      <div class="form-group">
                         <label for="message-text" class="col-form-label">Invoice#</label>
-                        <input type="number" class="form-control" required name="invoice_num" id="invoice_num">
+                        <input type="number" class="form-control invoice_num" required name="workorder_id" id="invoice_num">
                      </div>
                   </div>
                   <div class="col-sm-6">
                      <div class="form-group">
                         <label for="message-text" class="col-form-label">Amount Due</label>
-                        <input type="number" class="form-control" required name="amount_due">
+                        <input type="text" class="form-control" readonly id="amount_due">
                      </div>
                   </div>
                   <div class="col-6">
                      <div class="form-group">
                         <label for="message-text" class="col-form-label d-block">Payment Method</label>
-                        <select class="search-select-w-100 get-payment-price" name="payment_method_id" required>
+                        <select class="search-select-w-100 get-payment-price w-100" name="payment_method_id" id="payment_method_id" required>
                            <option value="">Select Payment Method</option>
                            @if (isset($payment_method_list))
                            @foreach ($payment_method_list as $payment_method)
@@ -102,7 +102,7 @@
                            <span class="input-group-addon">
                               <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
                            </span>
-                           <input type="text" class="simple-date-picker" placeholder="Select Date" autocomplete="off" name="payment_date"/>
+                           <input type="text" class="simple-date-picker" placeholder="Select Date" autocomplete="off" name="payment_date" id="payment_date"/>
                         </div>
                         <!-- End Date Picker -->
                      </div>
@@ -110,19 +110,19 @@
                   <div class="col-sm-6">
                      <div class="form-group">
                         <label for="message-text" class="col-form-label">Payment Amount</label>
-                        <input type="number" class="form-control" required name="payment_amount" value="">
+                        <input type="text" class="form-control" required name="payment_amount" id="payment_amount">
                      </div>
                   </div>
                   <div class="col-sm-6">
                      <div class="form-group">
                         <label for="message-text" class="col-form-label">Bank Name</label>
-                        <input type="text" class="form-control" name="bank_name">
+                        <input type="text" class="form-control" name="bank_name" id="bank_name">
                      </div>
                   </div>
                   <div class="col-sm-6">
                      <div class="form-group">
                         <label for="message-text" class="col-form-label">Invoice Amount</label>
-                        <input type="text" class="form-control" name="incoice_amount">
+                        <input type="text" class="form-control" readonly id="invoice_amount">
                      </div>
                   </div>
                   <div class="col-sm-6">
@@ -133,7 +133,7 @@
                            <span class="input-group-addon">
                               <img src="{{ asset('assets/img/svg/calender.svg') }}" alt="" class="svg">
                            </span>
-                           <input type="text" class="simple-date-picker" placeholder="Select Date" autocomplete="off" name="cheque_date"/>
+                           <input type="text" class="simple-date-picker" placeholder="Select Date" autocomplete="off" name="cheque_date" id="cheque_date"/>
                         </div>
                         <!-- End Date Picker -->
                      </div>
@@ -141,28 +141,28 @@
                   <div class="col-sm-6">
                      <div class="form-group">
                         <label for="message-text" class="col-form-label">Tax Amount(Provisional)</label>
-                        <input type="number" class="form-control" name="tax_amount">
+                        <input type="text" class="form-control" readonly id="tax_amount">
                      </div>
                   </div>
                   
                   <div class="col-sm-6">
                      <div class="form-group">
                         <label for="message-text" class="col-form-label">Cheque#</label>
-                        <input type="text" class="form-control" name="cheque_num">
+                        <input type="text" class="form-control" name="cheque_num" id="cheque_num">
                      </div>
                   </div>
                   
                   <div class="col-sm-6">
                      <div class="form-group">
                         <label for="message-text" class="col-form-label">Cheque Amount</label>
-                        <input type="number" class="form-control" name="cheque_amount">
+                        <input type="number" class="form-control" name="cheque_amount" id="cheque_amount">
                      </div>
                   </div>
                   <div class="col-sm-6">
                      <label for="message-text" class="col-form-label">Received</label>
                      <!-- Switch -->
                      <label class="switch with-icon">
-                        <input type="checkbox" name="received">
+                        <input type="checkbox" name="received" id="received">
                         <span class="control">
                            <span class="check"></span>
                         </span>
@@ -215,7 +215,7 @@
             pageLength: 10,
             ajax: "{{ route('payments.list') }}",
             columns: [
-            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            // {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'workorder_id', name: 'workorder_id'},
             {data: 'invoice_amount', name: 'invoice_amount'},
             {data: 'name', name: 'name'},
@@ -236,31 +236,101 @@
          });
          
       });
-      
-      $('.table-responsive').on('click', '.edit-workorder', function(e) {
+
+      var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+      $('#payments_table').on('change', '.payment-received > input[type="checkbox"]', function(e) {
          e.preventDefault();
-         const APP_URL = {!! json_encode(url('/')) !!};
          let id = $(this).attr('id').split('_');
-         
-         window.location.href = APP_URL+'/workorders/workorder/'+id[1];
+         var url = "{{url('/update-payment-received')}}";
+         $.ajax({
+            type:'POST',
+            url: url,
+            data: {
+               _token: CSRF_TOKEN,
+               payment_id: id[1],
+               received: $(this).prop("checked") ? 1 : 0,
+            },
+            success:function(data) {
+               console.log('Success');
+            }
+         });
+
+      });
+
+      $('#invoice_num').on('change', function(e) {
+         e.preventDefault();
+         console.log($(this).val());
+         var url = "{{url('/get-invoice-amounts')}}";
+         $.ajax({
+            type:'GET',
+            url: url,
+            data: {
+               workorder_id: $(this).val(),
+            },
+            success:function(data) {
+               $('#amount_due').val(data.amount_due);
+               $('#tax_amount').val(data.sales_tax);
+               $('#invoice_amount').val(data.sub_total);
+            }
+         });
+
+      });
+
+      $('#payments_table').on('click', '.edit-payment', function(e) {
+         e.preventDefault();
+         let id = $(this).attr('id').split('_');
+
+         // $('#invoice_num').val('');
+         // $('#payment_method_id').val('').select2({
+         //    dropdownAutoWidth: false,
+         //    width: '100%',
+         // }).trigger('change');
+         // $('#payment_date').val('');
+         // $('#payment_amount').val('');
+         // $('#bank_name').val('');
+         // $('#cheque_date').val('');
+         // $('#cheque_num').val('');
+         // $('#cheque_amount').val('');
+         // $('#received').prop('checked', false);
+
+         var url = "{{url('/get-payment-data')}}";
+         $.ajax({
+            type:'GET',
+            url: url,
+            data: {
+               payment_id: id[1],
+            },
+            success:function(data) {
+               $('#invoice_num').val(data.payment.workorder_id);
+               $('#payment_method_id').val(data.payment.payment_method_id).select2({
+                  dropdownAutoWidth: false,
+                  width: '100%',
+               }).trigger('change');
+               $('#payment_date').val(data.payment.payment_date);
+               $('#payment_amount').val(data.payment.payment_amount);
+               $('#bank_name').val(data.payment.bank_name);
+               $('#cheque_date').val(data.payment.cheque_date);
+               $('#cheque_num').val(data.payment.cheque_num);
+               $('#cheque_amount').val(data.payment.cheque_amount);
+               $('#received').prop('checked', data.payment.received == 1 ? true : false);
+
+               $('#payment_add_modal form').attr('action', APP_URL+'/workorders/payment/'+id[1]);
+               $('#payment_add_modal').modal('show');
+            }
+         });
+         // window.location.href = APP_URL+'/workorders/workorder/'+id[1];
          // $(this).attr('href', APP_URL+'/vendor/'+id[1]);
          // $('#vendor_delete_modal').modal('show');
       });
       
-      $('.table-responsive').on('click', '.cancel-workorder', function(e) {
+      
+      
+      $('#payments_table').on('click', '.cancel-workorder', function(e) {
          e.preventDefault();
          const APP_URL = {!! json_encode(url('/')) !!};
          let id = $(this).attr('id').split('_');
          
          $('#form_cancel_archive').attr('action', APP_URL+'/workorder/'+id[1]+'/cancelled').submit();
-      });
-      
-      $('.table-responsive').on('click', '.archive-workorder', function(e) {
-         e.preventDefault();
-         const APP_URL = {!! json_encode(url('/')) !!};
-         let id = $(this).attr('id').split('_');
-         
-         $('#form_cancel_archive').attr('action', APP_URL+'/workorder/'+id[1]+'/archived').submit();
       });
       
    });

@@ -32,6 +32,9 @@ Route::middleware([AuthMiddleware::class])->group(function () {
 
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments');
     Route::get('/payments/list', [PaymentController::class, 'getPayments'])->name('payments.list');//AJAX
+    Route::post('/update-payment-received', [PaymentController::class, 'updateReceived']);//AJAX
+    Route::get('/get-invoice-amounts', [PaymentController::class, 'getAmounts']);//AJAX
+    Route::get('/get-payment-data', [PaymentController::class, 'getPayment']);//AJAX
 
     Route::get('/company', [CompanyController::class, 'index'])->name('company');
     Route::post('/company', [CompanyController::class, 'store']);
