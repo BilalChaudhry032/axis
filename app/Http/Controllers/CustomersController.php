@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BillingAddress;
+use App\Models\City;
+use App\Models\Company;
+use App\Models\Country;
 use App\Models\CustomerChild;
 use App\Models\CustomerParent;
+use App\Models\Province;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
@@ -55,7 +60,18 @@ class CustomersController extends Controller
     }
 
     public function createCustomer() {
-        return view('customers.create');
+        $billing_address = BillingAddress::get();
+        $company = Company::get();
+        $country = Country::get();
+        $province = Province::get();
+        $city = City::get();
+        return view('customers.create', [
+            'billing_address' => $billing_address,
+            'company' => $company,
+            'country' => $country,
+            'province' => $province,
+            'city' => $city
+        ]);
     }
     public function getContacts(Request $request) {
         if($request->ajax()) {

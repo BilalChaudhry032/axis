@@ -39,7 +39,9 @@
         <div class="col-sm-9">
          <select class="search-select" name="company">
           <option value="">Select Company</option>
-          
+          @foreach ($company as $com)
+           <option value="{{ $com->company_id }}">{{ $com->name }}</option>
+          @endforeach
          </select>
         </div>
        </div>
@@ -82,7 +84,9 @@
         <div class="col-sm-9">
          <select class="search-select" name="" id="" required>
           <option value="">Select Billing Address</option>
-          
+          @foreach ($billing_address as $ba)
+           <option value="{{ $ba->billing_address_id }}">{{ $ba->name }}</option>
+          @endforeach
          </select>
         </div>
        </div>

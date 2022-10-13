@@ -35,11 +35,10 @@ class WorkOrderController extends Controller
                 ['cancelled', '=', 0],
                 ['archived', '=', 0]
                 ])
-                ->orderByDesc('workorder_id')
                 ->join('customer_parent', 'workorder.customer_id', '=', 'customer_parent.customer_id')
                 ->join('company', 'customer_parent.company_id', "=", "company.company_id")
                 ->select("workorder.workorder_id", "workorder.po_num", "workorder.report_name", DB::raw('DATE_FORMAT(workorder.date_received, "%d-%m-%Y") as date_received'), DB::raw('DATE_FORMAT(workorder.date_delivered, "%d-%m-%Y") as date_delivered'), "company.name");
-                // dd($workOrders[0]);
+
                 return DataTables::of($workOrders)
                 ->addIndexColumn()
                 ->addColumn('action', function($row){

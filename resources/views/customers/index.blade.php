@@ -55,12 +55,12 @@
             pageLength: 10,
             ajax: "{{ route('customers.list') }}",
             columns: [
-               {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-               {data: 'company_name', name: 'company.name'},
-               {data: 'billing_address_name', name: 'billing_address.name'},
-               {data: 'postal_address', name: 'customer_parent.postal_address'},
-               {data: 'city', name: 'customer_parent.city'},
-               {data: 'contacts_persons', name: 'contacts_persons', searchable: true},
+               {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: true},
+               {data: 'company_name', name: 'company_name', orderable: true},
+               {data: 'billing_address_name', name: 'billing_address_name', orderable: true},
+               {data: 'postal_address', name: 'postal_address', orderable: true},
+               {data: 'city', name: 'city', orderable: true},
+               {data: 'contacts_persons', name: 'contacts_persons', orderable: true},
                {
                   data: 'action', 
                   name: 'action', 
