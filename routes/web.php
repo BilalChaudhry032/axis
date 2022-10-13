@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\ArchivedController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WorkOrderController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BillingAddressController;
+use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\PartsController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Middleware\AuthMiddleware;
@@ -35,6 +37,15 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::post('/update-payment-received', [PaymentController::class, 'updateReceived']);//AJAX
     Route::get('/get-invoice-amounts', [PaymentController::class, 'getAmounts']);//AJAX
     Route::get('/get-payment-data', [PaymentController::class, 'getPayment']);//AJAX
+
+    Route::get('/archived', [ArchivedController::class, 'index'])->name('archived');
+    Route::get('/archived/list', [ArchivedController::class, 'getArchived'])->name('archived.list');//AJAX
+    Route::put('/workorder/{workorder_id}/un-archived', [ArchivedController::class, 'workorderUnArchive']);
+
+    Route::get('/customers', [CustomersController::class, 'index'])->name('customers');
+    Route::get('/customers/list', [CustomersController::class, 'getCustomers'])->name('customers.list');//AJAX
+    Route::get('/customers/create', [CustomersController::class, 'createCustomer']);
+    Route::get('/contacts/list', [CustomersController::class, 'getContacts'])->name('contacts.list');//AJAX
 
     Route::get('/company', [CompanyController::class, 'index'])->name('company');
     Route::post('/company', [CompanyController::class, 'store']);
@@ -96,15 +107,7 @@ Route::get('/users', function () {
     return view('Users');
 });
 
-Route::get('/archived', function () {
-    return view('Archived');
-});
-
 Route::get('/reports', function () {
     return view('Reports');
-});
-
-Route::get('/customers', function () {
-    return view('Customers');
 });
 

@@ -17,7 +17,7 @@
                   <h4 class="mb-2">Payments</h4>
                </div>
                <div>
-                  <a href="" data-toggle="modal" data-target="#payment_add_modal" type="button" class="btn btn-secondary px-3 py-2">Add Payment</a>
+                  <a href="" id="add_payment_modal_btn" type="button" class="btn btn-secondary px-3 py-2">Add Payment</a>
                </div>
             </div>
          </div>
@@ -44,11 +44,6 @@
             </table>
          </div>
       </div>
-      
-      <form action="" method="POST" style="display: none" id="form_cancel_archive" style="display: none">
-         @csrf
-         @method("PUT")
-      </form>
    </div>
 </div>
 
@@ -64,22 +59,23 @@
          </div>
          <form action="{{ url('/workorders/payments') }}" method="POST">
             @csrf
+            <div id="form_method"></div>
             <div class="modal-body">
                <div class="row edit-payment-parent">
                   <div class="col-sm-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Invoice#</label>
                         <input type="number" class="form-control invoice_num" required name="workorder_id" id="invoice_num">
                      </div>
                   </div>
                   <div class="col-sm-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Amount Due</label>
                         <input type="text" class="form-control" readonly id="amount_due">
                      </div>
                   </div>
                   <div class="col-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label d-block">Payment Method</label>
                         <select class="search-select-w-100 get-payment-price w-100" name="payment_method_id" id="payment_method_id" required>
                            <option value="">Select Payment Method</option>
@@ -95,7 +91,7 @@
                      </div>
                   </div>
                   <div class="col-sm-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Payment Date</label>
                         <!-- Date Picker -->
                         <div class="dashboard-date style--four">
@@ -108,25 +104,25 @@
                      </div>
                   </div>
                   <div class="col-sm-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Payment Amount</label>
                         <input type="text" class="form-control" required name="payment_amount" id="payment_amount">
                      </div>
                   </div>
                   <div class="col-sm-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Bank Name</label>
                         <input type="text" class="form-control" name="bank_name" id="bank_name">
                      </div>
                   </div>
                   <div class="col-sm-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Invoice Amount</label>
                         <input type="text" class="form-control" readonly id="invoice_amount">
                      </div>
                   </div>
                   <div class="col-sm-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Cheque Date</label>
                         <!-- Date Picker -->
                         <div class="dashboard-date style--four">
@@ -139,21 +135,21 @@
                      </div>
                   </div>
                   <div class="col-sm-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Tax Amount(Provisional)</label>
                         <input type="text" class="form-control" readonly id="tax_amount">
                      </div>
                   </div>
                   
                   <div class="col-sm-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Cheque#</label>
                         <input type="text" class="form-control" name="cheque_num" id="cheque_num">
                      </div>
                   </div>
                   
                   <div class="col-sm-6">
-                     <div class="form-group">
+                     <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Cheque Amount</label>
                         <input type="number" class="form-control" name="cheque_amount" id="cheque_amount">
                      </div>
@@ -178,6 +174,25 @@
             </div>
          </form>
       </div>
+   </div>
+</div>
+
+<!-- Modal Delete Payment -->
+<div class="modal fade" id="payment_delete_modal" tabindex="-1" role="dialog" aria-labelledby="payment_delete_label" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered" role="document">
+   <div class="modal-content">
+      <form action="" method="POST">
+         @csrf
+         @method('DELETE')
+         <div class="modal-body">
+         <h4>Are you sure, you want to Delete this Payment?</h4>
+         </div>
+         <div class="modal-footer border-0">
+         <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+         <button type="submit" class="btn btn-primary bg-danger">Delete</button>
+         </div>
+      </form>
+   </div>
    </div>
 </div>
 @endsection
@@ -276,22 +291,43 @@
 
       });
 
+      $('#add_payment_modal_btn').on('click', function(e) {
+         e.preventDefault();
+         const APP_URL = {!! json_encode(url('/')) !!};
+
+         $('#invoice_num').val('');
+         $('#payment_method_id').val('').select2({
+            dropdownAutoWidth: false,
+            width: '100%',
+         }).trigger('change');
+         $('#payment_date').val('');
+         $('#payment_amount').val('');
+         $('#bank_name').val('');
+         $('#cheque_date').val('');
+         $('#cheque_num').val('');
+         $('#cheque_amount').val('');
+         $('#received').prop('checked', false);
+         $('#amount_due').val('');
+         $('#tax_amount').val('');
+         $('#invoice_amount').val('');
+         
+         if($('#form_method').html() != ''){
+            $('#form_method').empty();
+         }
+
+         $('#payment_add_label').text('Add Payment');
+         $('#payment_add_modal button[type="submit"]').text('Add Payment');
+         $('#payment_add_modal form').attr('action', APP_URL+'/workorders/payments');
+         $('#payment_add_modal').modal('show');
+      })
+
       $('#payments_table').on('click', '.edit-payment', function(e) {
          e.preventDefault();
+         $('#amount_due').val('');
+         $('#tax_amount').val('');
+         $('#invoice_amount').val('');
+         const APP_URL = {!! json_encode(url('/')) !!};
          let id = $(this).attr('id').split('_');
-
-         // $('#invoice_num').val('');
-         // $('#payment_method_id').val('').select2({
-         //    dropdownAutoWidth: false,
-         //    width: '100%',
-         // }).trigger('change');
-         // $('#payment_date').val('');
-         // $('#payment_amount').val('');
-         // $('#bank_name').val('');
-         // $('#cheque_date').val('');
-         // $('#cheque_num').val('');
-         // $('#cheque_amount').val('');
-         // $('#received').prop('checked', false);
 
          var url = "{{url('/get-payment-data')}}";
          $.ajax({
@@ -301,7 +337,7 @@
                payment_id: id[1],
             },
             success:function(data) {
-               $('#invoice_num').val(data.payment.workorder_id);
+               $('#invoice_num').val(data.payment.workorder_id).change();
                $('#payment_method_id').val(data.payment.payment_method_id).select2({
                   dropdownAutoWidth: false,
                   width: '100%',
@@ -314,23 +350,25 @@
                $('#cheque_amount').val(data.payment.cheque_amount);
                $('#received').prop('checked', data.payment.received == 1 ? true : false);
 
+               if($('#form_method').html() == ''){
+                  $('#form_method').html('<input type="hidden" name="_method" value="PUT">');
+               }
+
+               $('#payment_add_label').text('Edit Payment');
+               $('#payment_add_modal button[type="submit"]').text('Edit Payment');
                $('#payment_add_modal form').attr('action', APP_URL+'/workorders/payment/'+id[1]);
                $('#payment_add_modal').modal('show');
             }
          });
-         // window.location.href = APP_URL+'/workorders/workorder/'+id[1];
-         // $(this).attr('href', APP_URL+'/vendor/'+id[1]);
-         // $('#vendor_delete_modal').modal('show');
       });
       
-      
-      
-      $('#payments_table').on('click', '.cancel-workorder', function(e) {
+      $('#payments_table').on('click', '.delete-payment', function(e) {
          e.preventDefault();
          const APP_URL = {!! json_encode(url('/')) !!};
          let id = $(this).attr('id').split('_');
          
-         $('#form_cancel_archive').attr('action', APP_URL+'/workorder/'+id[1]+'/cancelled').submit();
+         $('#payment_delete_modal form').attr('action', APP_URL+'/workorders/payment/'+id[1]);
+         $('#payment_delete_modal').modal('show');
       });
       
    });

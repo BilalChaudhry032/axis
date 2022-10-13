@@ -7,24 +7,23 @@
          <div class="card-body pb-0">
             <div class="d-flex justify-content-between align-items-center">
                <div class="title-content">
-                  <h4 class="mb-2">Workorders</h4>
+                  <h4 class="mb-2">Customers</h4>
                </div>
                <div>
-                  <a href="{{ url('/workorders/create') }}" type="button" class="btn btn-secondary px-3 py-2">New Workorder</a>
+                  <a href="{{ url('/customers/create') }}" type="button" class="btn btn-secondary px-3 py-2">New Customer</a>
                </div>
             </div>
          </div>
          <div class="table-responsive">
-            <table class="" id="workorder_table">
+            <table class="" id="customers_table">
                <thead>
                   <tr>
                      <th>SR#</th>
                      <th>Company</th>
-                     <th>Invoice#</th>
-                     <th>PO#</th>
-                     <th>Report Name</th>
-                     <th>Date Received</th>
-                     <th>Date Delivered</th>
+                     <th>Billing Address</th>
+                     <th>Postal Address</th>
+                     <th>City</th>
+                     <th>Contacts Persons</th>
                      <th>Actions</th>
                   </tr>
                </thead>
@@ -49,20 +48,19 @@
 
       $(function () {
          
-         var table = $('#workorder_table').DataTable({
+         var table = $('#customers_table').DataTable({
             processing: true,
             serverSide: true,
             paging: true,
             pageLength: 10,
-            ajax: "{{ route('workorders.list') }}",
+            ajax: "{{ route('customers.list') }}",
             columns: [
                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-               {data: 'name', name: 'company.name'},
-               {data: 'workorder_id', name: 'workorder.workorder_id'},
-               {data: 'po_num', name: 'workorder.po_num'},
-               {data: 'report_name', name: 'workorder.report_name'},
-               {data: 'date_received', name: 'workorder.date_received'},
-               {data: 'date_delivered', name: 'workorder.date_delivered'},
+               {data: 'company_name', name: 'company.name'},
+               {data: 'billing_address_name', name: 'billing_address.name'},
+               {data: 'postal_address', name: 'customer_parent.postal_address'},
+               {data: 'city', name: 'customer_parent.city'},
+               {data: 'contacts_persons', name: 'contacts_persons', searchable: true},
                {
                   data: 'action', 
                   name: 'action', 

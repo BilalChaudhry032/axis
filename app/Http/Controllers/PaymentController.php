@@ -109,9 +109,9 @@ class PaymentController extends Controller
         }
 
         $sales_tax_rate = Workorder::where('workorder_id', '=', $workorder_id)->select('sales_tax_rate')->first();
-        $sales_tax_rate = $sales_tax_rate;
+        $sales_tax_rate = $sales_tax_rate == null ? 0 : $sales_tax_rate->sales_tax_rate;
 
-        $sales_tax = $sub_total*$sales_tax_rate/100;
+        $sales_tax = $sub_total * $sales_tax_rate/100;
 
         $payments = Payment::where([
         ['workorder_id', '=', $workorder_id],
@@ -133,7 +133,8 @@ class PaymentController extends Controller
     public function getPayment() {
         $payment_id = $_GET['payment_id'];
 
-        $payment = Payment::where('payment_id', '=', $payment_id)->first();
+        $payment = Payment::where('payment_id', '=', $payment_id)
+        ->select('payment.*', DB::raw('DATE_FORMAT(payment.payment_date, "%d-%m-%Y") as payment_date'), DB::raw('DATE_FORMAT(payment.cheque_date, "%d-%m-%Y") as cheque_date'))->first();
         return response()->json(['payment'=> $payment], 200);
     }
 }
