@@ -45,6 +45,9 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::get('/customers', [CustomersController::class, 'index'])->name('customers');
     Route::get('/customers/list', [CustomersController::class, 'getCustomers'])->name('customers.list');//AJAX
     Route::get('/customers/create', [CustomersController::class, 'createCustomer']);
+    Route::post('/customers/store', [CustomersController::class, 'storeCustomer']);
+    Route::get('/customers/update', [CustomersController::class, 'updateCustomer']);
+    Route::put('/customers/update', [CustomersController::class, 'editCustomer']);
     Route::get('/contacts/list', [CustomersController::class, 'getContacts'])->name('contacts.list');//AJAX
 
     Route::get('/company', [CompanyController::class, 'index'])->name('company');

@@ -15,7 +15,7 @@
 <div class="row">
  <div class="col-xl-12">
   <div class="card mb-30">
-   <h4 class="font-20 mb-30 mt-30 mx-4">New Customer</h4>
+   <h4 class="font-20 mb-30 mt-30 mx-4">Edit Customer</h4>
    <div class="card-body">
     <form action="{{ url('/customers/store') }}" method="post" id="customer_store_form">
      @csrf
@@ -154,7 +154,7 @@
       
       <div class="col-12">
        <div class="form-row">
-        <div class="col-12 text-right py-3">
+        <div class="col-12 text-right pt-3">
          <button type="submit" class="btn long">Save Customer</button>
         </div>
        </div>
@@ -162,6 +162,37 @@
       
      </div>
     </form>
+   </div>
+   <hr>
+   <div class="card-body pb-0">
+    <div class="d-flex justify-content-between align-items-center">
+     <div class="title-content">
+      <h4 class="mb-2">New Contacts</h4>
+     </div>
+     <div>
+      <a href="" type="button" class="btn btn-secondary px-3 py-2">Add Contact</a>
+     </div>
+    </div>
+   </div>
+   <div class="table-responsive">
+    <table class="invoice-list" id="contacts_table">
+     <thead>
+      <tr>
+       <th>SR#</th>
+       <th>Contact Title</th>
+       <th>First Name</th>
+       <th>Last Name</th>
+       <th>Direct</th>
+       <th>Cell</th>
+       <th>Email</th>
+       <th>Notes</th>
+       <th>Actions</th>
+      </tr>
+     </thead>
+     <tbody>
+      <tr><td colspan="9" class="text-center"><p>No Data Found!</p></td></tr>
+     </tbody>
+    </table>
    </div>
    
   </div>
@@ -184,10 +215,94 @@
 
 <script>
  $(document).ready(function() {
+  
   $(".search-select").select2({
    dropdownAutoWidth: false,
    width: '100%'
   });
+  
+  $(function () {
+   
+   var table = $('#contacts_table').DataTable({
+    // processing: true,
+    // serverSide: true,
+    // paging: true,
+    // pageLength: 10,
+    // ajax: "{{ route('contacts.list') }}",
+    // columns: [
+    // {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+    // {data: 'company_name', name: 'company.name'},
+    // {data: 'billing_address_name', name: 'billing_address.name'},
+    // {data: 'postal_address', name: 'customer_parent.postal_address'},
+    // {data: 'city', name: 'customer_parent.city'},
+    // {data: 'contacts_persons', name: 'contacts_persons', searchable: true},
+    // {
+    //  data: 'action', 
+    //  name: 'action', 
+    //  orderable: false, 
+    //  searchable: false
+    // },
+    // ]
+   });
+   
+  });
+  
+  
+  // $('#wo_company_id').change(function() {
+  //  var url = "{{url('/get-company-addresses')}}";
+  //  $.ajax({
+  //   type:'GET',
+  //   url: url,
+  //   data: {
+  //    wo_company_id: $(this).val(),
+  //   },
+  //   success:function(data) {
+  //    $('#wo_billing_address').empty();
+  //    $('#wo_contact_person').empty();
+     
+  //    var defaultOption1 = new Option('Select Billing Address', '', false, false);
+  //    $('#wo_billing_address').append(defaultOption1).trigger('change');
+     
+  //    var defaultOption2 = new Option('Select Contact Person', '', false, false);
+  //    $('#wo_contact_person').append(defaultOption2).trigger('change');
+     
+  //    $(data.response).each(function(i) {
+  //     var newOption = new Option(data.response[i]['name'], data.response[i]['billing_address_id'], false, false);
+  //     $('#wo_billing_address').append(newOption).trigger('change');
+  //    });
+  //   }
+  //  });
+  // });
+  
+  // $('#wo_billing_address').change(function() {
+  //  if($(this).val() != '') {
+  //   var url = "{{url('/get-company-persons')}}";
+  //   $.ajax({
+  //    type:'GET',
+  //    url: url,
+  //    data: {
+  //     wo_company_id: $('#wo_company_id').val(),
+  //     wo_billing_address_id: $(this).val(),
+  //    },
+  //    success:function(data) {
+  //     $('#wo_contact_person').empty();
+  //     var defaultOption = new Option('Select Contact Person', '', false, false);
+  //     $('#wo_contact_person').append(defaultOption).trigger('change');
+  //     $(data.response).each(function(i) {
+  //      var newOption = new Option(
+  //      ((data.response[i]['first_name']) == null || (data.response[i]['first_name']) == '' ? '' : data.response[i]['first_name'])+' '+((data.response[i]['last_name']) == null || (data.response[i]['last_name']) == '' ? '' : data.response[i]['last_name']), 
+  //      data.response[i]['child_id'], 
+  //      false, 
+  //      false
+  //      );
+  //      $('#wo_contact_person').append(newOption).trigger('change');
+  //     });
+  //     $('#postal_address').text(data[0].postal_address);
+  //    }
+  //   });
+  //  }
+  // });
+  
  });
 </script>
 @endsection
