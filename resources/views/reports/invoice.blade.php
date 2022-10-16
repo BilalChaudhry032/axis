@@ -2,7 +2,7 @@
 <html>
 <head>
  
- <title>Invoice 25501</title>
+ <title>Invoice</title>
  
  <link href="{{ asset('/assets/css/rpt_style.css') }}" type="text/css" rel="stylesheet"/>
  

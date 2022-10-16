@@ -33,11 +33,26 @@
          </div>
       </div>
       
-      <form action="" method="POST" style="display: none" id="form_cancel_archive">
-         @csrf
-         @method("PUT")
-      </form>
    </div>
+</div>
+
+<!-- Modal Delete -->
+<div class="modal fade" id="customer_delete_modal" tabindex="-1" role="dialog" aria-labelledby="customer_delete_label" aria-hidden="true">
+ <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-content">
+   <form action="" method="POST">
+    @csrf
+    @method('DELETE')
+    <div class="modal-body">
+     <h4>Are you sure, you want to Delete this Customer?</h4>
+    </div>
+    <div class="modal-footer border-0">
+     <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+     <button type="submit" class="btn btn-primary bg-danger">Delete</button>
+    </div>
+   </form>
+  </div>
+ </div>
 </div>
 @endsection
 
@@ -72,28 +87,21 @@
          
       });
 
-      $('.table-responsive').on('click', '.edit-workorder', function(e) {
+      $('.table-responsive').on('click', '.edit-customer', function(e) {
          e.preventDefault();
          const APP_URL = {!! json_encode(url('/')) !!};
          let id = $(this).attr('id').split('_');
 
-         window.location.href = APP_URL+'/workorders/workorder/'+id[1];
+         window.location.href = APP_URL+'/customers/'+id[1]+'/update';
       });
       
-      $('.table-responsive').on('click', '.cancel-workorder', function(e) {
+      $('.table-responsive').on('click', '.delete-customer', function(e) {
          e.preventDefault();
          const APP_URL = {!! json_encode(url('/')) !!};
          let id = $(this).attr('id').split('_');
 
-         $('#form_cancel_archive').attr('action', APP_URL+'/workorder/'+id[1]+'/cancelled').submit();
-      });
-
-      $('.table-responsive').on('click', '.archive-workorder', function(e) {
-         e.preventDefault();
-         const APP_URL = {!! json_encode(url('/')) !!};
-         let id = $(this).attr('id').split('_');
-
-         $('#form_cancel_archive').attr('action', APP_URL+'/workorder/'+id[1]+'/archived').submit();
+         $('#customer_delete_modal form').attr('action', APP_URL+'/customer/'+id[1]);
+         $('#customer_delete_modal').modal('show');
       });
       
    });

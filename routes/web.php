@@ -10,6 +10,8 @@ use App\Http\Controllers\BillingAddressController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\PartsController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\UsersController;
 use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,6 +26,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::get('/', function () {
         return view('layouts.master');
     });
+
+    Route::get('/users', [UsersController::class, 'index'])->name('users');
 
     Route::get('/vendor', [VendorController::class, 'index'])->name('vendor');
     Route::get('/vendor/list', [VendorController::class, 'getVendors'])->name('vendor.list');//AJAX
@@ -46,9 +50,14 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::get('/customers/list', [CustomersController::class, 'getCustomers'])->name('customers.list');//AJAX
     Route::get('/customers/create', [CustomersController::class, 'createCustomer']);
     Route::post('/customers/store', [CustomersController::class, 'storeCustomer']);
-    Route::get('/customers/update', [CustomersController::class, 'updateCustomer']);
-    Route::put('/customers/update', [CustomersController::class, 'editCustomer']);
+    Route::get('/customers/{customer_id}/update', [CustomersController::class, 'updateCustomer']);
+    Route::put('/customers/{customer_id}/update', [CustomersController::class, 'editCustomer']);
+    Route::delete('/customer/{customer_id}', [CustomersController::class, 'destroyCustomer']);
     Route::get('/contacts/list', [CustomersController::class, 'getContacts'])->name('contacts.list');//AJAX
+    Route::get('/get-contact', [CustomersController::class, 'getContact']);//AJAX
+    Route::put('/contacts/contact/{contact_id}', [CustomersController::class, 'editContact']);
+    Route::post('/contacts/store', [CustomersController::class, 'storeContact']);
+    Route::delete('/contact/{contact_id}', [CustomersController::class, 'destroyContact']);
 
     Route::get('/company', [CompanyController::class, 'index'])->name('company');
     Route::post('/company', [CompanyController::class, 'store']);
@@ -103,14 +112,18 @@ Route::middleware([AuthMiddleware::class])->group(function () {
 
     // *** Routes for Workorders -End- ***
 
-});
+    Route::get('/reports', [ReportsController::class, 'index'])->name('reports');
+    Route::get('/reports/monthly-sale', [ReportsController::class, 'getMonthlySale']);
+    Route::get('/reports/receivable', [ReportsController::class, 'getReceivable']);
+    Route::get('/reports/pending', [ReportsController::class, 'getPending']);
+    Route::get('/reports/product', [ReportsController::class, 'getProduct']);
+    Route::get('/reports/tax', [ReportsController::class, 'getTax']);
+    Route::get('/reports/stat', [ReportsController::class, 'getStat']);
+    Route::get('/reports/branch', [ReportsController::class, 'getBranch']);
+    Route::get('/reports/order-list', [ReportsController::class, 'getOrderList']);
+    Route::get('/reports/vendor', [ReportsController::class, 'getVendor']);
+    Route::get('/reports/report-name', [ReportsController::class, 'getReportName']);
+    Route::get('/reports/country', [ReportsController::class, 'getCountry']);
 
-
-Route::get('/users', function () {
-    return view('Users');
-});
-
-Route::get('/reports', function () {
-    return view('Reports');
 });
 

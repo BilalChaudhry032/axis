@@ -11,7 +11,15 @@ class CustomerChild extends Model
 
     protected $table = 'customer_child';
     public $timestamps = false;
-    // protected $fillable = [
-    //     'name'
-    // ];
+    protected $fillable = [
+        'customer_id',
+        'contact_title',
+        'first_name',
+        'last_name',
+        'direct',
+        'cell',
+        'email',
+        'notes',
+        'active',
+    ];
 }
