@@ -124,4 +124,23 @@ class UsersController extends Controller
         $buttons = Button::orderBy('position')->get();
         return response()->json(['isButton'=> $isButton, 'buttons' => $buttons], 200);
     }
+
+    public function updateButtonUser() {
+        $button_id = $_POST['button_id'];
+        $user_id = $_POST['user_id'];
+        $isAllowed = $_POST['isAllowed'];
+        
+        if($isAllowed) {
+            ButtonUser::create([
+                'button_page_id' => $button_id,
+                'user_id' => $user_id
+            ]);
+        } else {
+            ButtonUser::where([
+                ['button_page_id', '=', $button_id],
+                ['user_id', '=', $user_id]
+            ])->delete();
+        }
+        return response()->json(200);
+    }
 }

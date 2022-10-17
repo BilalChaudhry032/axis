@@ -8,18 +8,30 @@
       <!-- End Sidebar Toggle Pin Button -->
    </div>
    <!-- End Sidebar Header -->
-
+   
    <!-- Sidebar Body -->
    <div class="sidebar-body">
       <!-- Nav -->
       <ul class="nav">
-         {{-- <li class="{{ Request::is('/') ? 'active' : '' }}">
-            <a href="{{ url('/') }}">
-               <i class="icofont-pie-chart"></i>
-               <span class="link-title">Dashboard</span>
+         
+         @php
+         $AuthUser = Illuminate\Support\Facades\Session::get('user-session');
+         $user_id = $AuthUser['uid'];
+         
+         $pages = App\Models\PageUser::join('page', 'page.page_id', '=', 'page_user.page_id')
+         ->where('page_user.user_id', '=', $user_id)
+         ->select('page_user.*', 'page.*')->orderBy('position')->get();
+         @endphp
+         
+         @foreach ($pages as $page)
+         <li class="{{ Route::current()->getName() == $page->name ? 'active' : '' }}">
+            <a href="{{ Route($page->name) }}">
+               <i class="icofont-file-document"></i>
+               <span class="link-title">{{ $page->name }}</span>
             </a>
-         </li> --}}
-         <li class="{{ Request::is('workorders') ? 'active' : '' }}">
+         </li>
+         @endforeach
+         {{-- <li class="{{ Request::is('workorders') ? 'active' : '' }}">
             <a href="{{ url('/workorders') }}">
                <i class="icofont-shopping-cart"></i>
                <span class="link-title">Workorders</span>
@@ -78,7 +90,7 @@
                <i class="icofont-files-stack"></i>
                <span class="link-title">Vendor</span>
             </a>
-         </li>
+         </li> --}}
       </ul>
       <!-- End Nav -->
    </div>

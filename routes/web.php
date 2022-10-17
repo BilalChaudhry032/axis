@@ -8,11 +8,13 @@ use App\Http\Controllers\VendorController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\BillingAddressController;
 use App\Http\Controllers\CustomersController;
+use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\PartsController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Middleware\AuthMiddleware;
+use App\Http\Middleware\UserPermissions;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -27,7 +29,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         return view('layouts.master');
     });
 
-    Route::get('/users', [UsersController::class, 'index'])->name('users');
+    Route::get('/users', [UsersController::class, 'index'])->name('Users')->middleware([UserPermissions::class]);
     Route::get('/users/list', [UsersController::class, 'getUsers'])->name('users.list');//AJAX
     Route::post('/user', [UsersController::class, 'store']);
     Route::get('/get-user', [UsersController::class, 'getUser']);
@@ -37,25 +39,26 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::get('/get-page-user', [UsersController::class, 'getPageUser'])->name('page.user');//AJAX
     Route::post('/update-user-rights', [UsersController::class, 'updateUserRights']);
     Route::get('/get-button-user', [UsersController::class, 'getButtoneUser'])->name('button.user');//AJAX
+    Route::post('/update-button-user', [UsersController::class, 'updateButtonUser']);
 
-    Route::get('/vendor', [VendorController::class, 'index'])->name('vendor');
+    Route::get('/vendor', [VendorController::class, 'index'])->name('Vendor')->middleware([UserPermissions::class]);
     Route::get('/vendor/list', [VendorController::class, 'getVendors'])->name('vendor.list');//AJAX
     Route::get('/get-vendor', [VendorController::class, 'getVendor']);//AJAX
     Route::post('/vendor', [VendorController::class, 'store']);
     Route::put('/vendor/{vendor_id}', [VendorController::class, 'update']);
     Route::delete('/vendor/{vendor_id}', [VendorController::class, 'destroy']);
 
-    Route::get('/payments', [PaymentController::class, 'index'])->name('payments');
+    Route::get('/payments', [PaymentController::class, 'index'])->name('Payments')->middleware([UserPermissions::class]);
     Route::get('/payments/list', [PaymentController::class, 'getPayments'])->name('payments.list');//AJAX
     Route::post('/update-payment-received', [PaymentController::class, 'updateReceived']);//AJAX
     Route::get('/get-invoice-amounts', [PaymentController::class, 'getAmounts']);//AJAX
     Route::get('/get-payment-data', [PaymentController::class, 'getPayment']);//AJAX
 
-    Route::get('/archived', [ArchivedController::class, 'index'])->name('archived');
+    Route::get('/archived', [ArchivedController::class, 'index'])->name('Archived')->middleware([UserPermissions::class]);
     Route::get('/archived/list', [ArchivedController::class, 'getArchived'])->name('archived.list');//AJAX
     Route::put('/workorder/{workorder_id}/un-archived', [ArchivedController::class, 'workorderUnArchive']);
 
-    Route::get('/customers', [CustomersController::class, 'index'])->name('customers');
+    Route::get('/customers', [CustomersController::class, 'index'])->name('Customers')->middleware([UserPermissions::class]);
     Route::get('/customers/list', [CustomersController::class, 'getCustomers'])->name('customers.list');//AJAX
     Route::get('/customers/create', [CustomersController::class, 'createCustomer']);
     Route::post('/customers/store', [CustomersController::class, 'storeCustomer']);
@@ -68,23 +71,23 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::post('/contacts/store', [CustomersController::class, 'storeContact']);
     Route::delete('/contact/{contact_id}', [CustomersController::class, 'destroyContact']);
 
-    Route::get('/company', [CompanyController::class, 'index'])->name('company');
+    Route::get('/company', [CompanyController::class, 'index'])->name('Company')->middleware([UserPermissions::class]);
     Route::post('/company', [CompanyController::class, 'store']);
     Route::put('/company/{company_id}', [CompanyController::class, 'update']);
     Route::delete('/company/{company_id}', [CompanyController::class, 'destroy']);
 
-    Route::get('/billing-address', [BillingAddressController::class, 'index'])->name('billingAddress');
+    Route::get('/billing-address', [BillingAddressController::class, 'index'])->name('Billing Address')->middleware([UserPermissions::class]);
     Route::post('/billing-address', [BillingAddressController::class, 'store']);
     Route::put('/billing-address/{billing_address_id}', [BillingAddressController::class, 'update']);
     Route::delete('/billing-address/{billing_address_id}', [BillingAddressController::class, 'destroy']);
 
-    Route::get('/parts', [PartsController::class, 'index'])->name('parts');
+    Route::get('/parts', [PartsController::class, 'index'])->name('Parts')->middleware([UserPermissions::class]);
     Route::post('/parts', [PartsController::class, 'store']);
     Route::put('/parts/{part_id}', [PartsController::class, 'update']);
     Route::delete('/parts/{part_id}', [PartsController::class, 'destroy']);
 
     // *** Routes for Workorders -Start- ***
-    Route::get('/workorders', [WorkOrderController::class, 'index'])->name('workorders');
+    Route::get('/workorders', [WorkOrderController::class, 'index'])->name('Workorders')->middleware([UserPermissions::class]);
         Route::get('/workorders/list', [WorkOrderController::class, 'getWorkOrders'])->name('workorders.list');//AJAX
 
         Route::get('/workorder/{workorder_id}/invoice', [WorkOrderController::class, 'workorderInvoice']);
@@ -121,7 +124,7 @@ Route::middleware([AuthMiddleware::class])->group(function () {
 
     // *** Routes for Workorders -End- ***
 
-    Route::get('/reports', [ReportsController::class, 'index'])->name('reports');
+    Route::get('/reports', [ReportsController::class, 'index'])->name('Reports')->middleware([UserPermissions::class]);
     Route::get('/reports/monthly-sale', [ReportsController::class, 'getMonthlySale']);
     Route::get('/reports/receivable', [ReportsController::class, 'getReceivable']);
     Route::get('/reports/pending', [ReportsController::class, 'getPending']);

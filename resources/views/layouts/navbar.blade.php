@@ -36,7 +36,7 @@
                               {{-- <span id="hours">21</span>
                               <span id="point">:</span>
                               <span id="min">06</span> --}}
-                              <span id="time-12h">12 : 00</span>
+                              <span id="time-12h">00 : 00</span>
                            </h3>
                            <span class="date"><span id="date">Tue, 12 October 2019</span></span>
                         </div>

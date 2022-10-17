@@ -84,7 +84,7 @@
                               </div>
                            </div>
                            
-                           <div class="col-sm-12" id="page_list">
+                           <div class="col-lg-4 offset-lg-2" id="page_list">
                               <div class="row">
                                  @foreach ($pages as $page)
                                  <div class="col-sm-12">
@@ -124,7 +124,7 @@
                               </div>
                            </div>
                            
-                           <div class="col-sm-12" id="page_list2">
+                           <div class="col-lg-4 offset-lg-2" id="page_list2">
                               <div class="row">
                                  @foreach ($buttons as $button)
                                  <div class="col-sm-12">
@@ -442,16 +442,17 @@
                      user_id: id,
                   },
                   success:function(data) {
-                     $('#page_list').empty();
+
+                     $('#page_list2').empty();
                      let html = `<div class="row">`;
                         $(data.buttons).each(function(i) {
                            html +=`<div class="col-sm-12">
                               <div class="d-flex align-items-center mb-4">
                                  <div class="switch-wrap">
                                     <label class="switch">
-                                       <input type="checkbox" class="" value="`+data.buttons[i]['page_id']+`" `;
-                                       $(data.isPage).each(function(j) {
-                                          if(data.buttons[i]['page_id'] == data.isPage[j]['page_id']) {
+                                       <input type="checkbox" class="" value="`+data.buttons[i]['button_id']+`" `;
+                                       $(data.isButton).each(function(j) {
+                                          if(data.buttons[i]['button_id'] == data.isButton[j]['button_id']) {
                                              html +=` checked`;
                                           }
                                        });
@@ -463,14 +464,32 @@
                            </div>`;
                         });
                         html +=`</div>`;
-                        $('#page_list').html(html);
+                        $('#page_list2').html(html);
                      }
                   });
                } else {
-                  $('#page_list input[type="checkbox"]').prop('disabled', true);
+                  $('#page_list2 input[type="checkbox"]').prop('disabled', true);
                }
             });
             
+            $('#page_rights').on('change', '#page_list2 input[type="checkbox"]', function(e) {
+               e.preventDefault();
+               let id = $(this).val();
+               var url = "{{url('/update-button-user')}}";
+               $.ajax({
+                  type:'POST',
+                  url: url,
+                  data: {
+                     _token: CSRF_TOKEN,
+                     button_id: id,
+                     user_id: $('#user_select2').val(),
+                     isAllowed: $(this).prop("checked") ? 1 : 0,
+                  },
+                  success:function(data) {
+                     console.log('Success');
+                  }
+               });
+            });
             
          });
       </script>

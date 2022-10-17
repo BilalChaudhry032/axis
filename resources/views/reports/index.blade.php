@@ -16,17 +16,12 @@
     <h4 class="mb-3">Reports</h4>
     
     <ul class="nav flex-column">
-     <li><a class="active" data-toggle="tab" href="#Monthly_Sale_tab" id="Monthly_Sale_btn">Monthly Sale</a></li>
-     <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="Receivable_btn">Receivable</a></li>
-     <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="Pending_Workorders_btn">Pending Workorders</a></li>
-     <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="Product-Wise_btn">Product Wise</a></li>
-     <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="Tax_btn">Tax</a></li>
-     <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="Stat_btn">Stat</a></li>
-     <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="Branch_Wise_btn">Branch Wise</a></li>
-     <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="Order_List_btn">Order List</a></li>
-     <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="Vendor_btn">Vendor</a></li>
-     <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="Report_Name_btn">Report Name</a></li>
-     <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="Country-Wise_btn">Country Wise</a></li>
+     @php
+         // dd($isButton);
+     @endphp
+     @foreach ($isButton as $button)
+      <li><a data-toggle="tab" href="#Monthly_Sale_tab" id="{{ $button->bID }}_btn">{{ $button->name }}</a></li>
+     @endforeach
     </ul>
    </nav>
    <!-- End Aside Body -->
@@ -38,10 +33,10 @@
    
    <div class="col-xl-12 mb-30 mb-xl-0">
     <!-- Card -->
-    <div class="card h-100">
+    <div class="card h-100 min-vh-100">
      <div class="card-body p-30">
       <div class="tab-content">
-       <div class="tab-pane fade show active" id="Monthly_Sale_tab">
+       <div class="tab-pane fade " id="Monthly_Sale_tab">
         <h4 class="mb-4" id="form_title">Monthly Sale</h4>
         
         <form action="{{ url('/reports/monthly-sale') }}"  target="_blank" id="report_form">
@@ -281,7 +276,7 @@
    }
   });
   
-  $('#Monthly_Sale_btn').on('click', function(e) {
+  $('#monthly_sale_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/monthly-sale')}}";
    
@@ -300,7 +295,7 @@
    
   });
   
-  $('#Receivable_btn').on('click', function(e) {
+  $('#receivable_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/receivable')}}";
    
@@ -312,7 +307,7 @@
    $('select[name="company_id"]').prop('required',false).trigger('change');
   });
 
-  $('#Pending_Workorders_btn').on('click', function(e) {
+  $('#pending_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/pending')}}";
    
@@ -324,7 +319,7 @@
    $('select[name="company_id"]').prop('required',false).trigger('change');
   });
 
-  $('#Product-Wise_btn').on('click', function(e) {
+  $('#product_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/product')}}";
    
@@ -336,7 +331,7 @@
    $('select[name="company_id"]').prop('required',false).trigger('change');
   });
 
-  $('#Tax_btn').on('click', function(e) {
+  $('#tax_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/tax')}}";
    
@@ -348,7 +343,7 @@
    $('select[name="company_id"]').prop('required',false).trigger('change');
   });
 
-  $('#Stat_btn').on('click', function(e) {
+  $('#stat_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/stat')}}";
    
@@ -360,7 +355,7 @@
    $('select[name="company_id"]').prop('required',false).trigger('change');
   });
 
-  $('#Branch_Wise_btn').on('click', function(e) {
+  $('#payment_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/branch')}}";
    
@@ -372,7 +367,7 @@
    $('select[name="company_id"]').prop('required',false).trigger('change');
   });
 
-  $('#Order_List_btn').on('click', function(e) {
+  $('#list_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/order-list')}}";
    
@@ -384,7 +379,7 @@
    $('select[name="company_id"]').prop('required',true).trigger('change');
   });
 
-  $('#Vendor_btn').on('click', function(e) {
+  $('#vendor_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/vendor')}}";
    
@@ -396,7 +391,7 @@
    $('select[name="company_id"]').prop('required',false).trigger('change');
   });
 
-  $('#Report_Name_btn').on('click', function(e) {
+  $('#report_name_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/report-name')}}";
    
@@ -408,7 +403,7 @@
    $('select[name="company_id"]').prop('required',false).trigger('change');
   });
 
-  $('#Country-Wise_btn').on('click', function(e) {
+  $('#country_btn').on('click', function(e) {
    e.preventDefault();
    var url = "{{url('/reports/country')}}";
    

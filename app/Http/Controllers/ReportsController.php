@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BillingAddress;
+use App\Models\ButtonUser;
 use App\Models\City;
 use App\Models\Company;
 use App\Models\Country;
@@ -12,10 +13,20 @@ use App\Models\Workorder;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class ReportsController extends Controller
 {
     public function index() {
+        $AuthUser = Session::get('user-session');
+        $user_id = $AuthUser['uid'];
+
+        $isButton = ButtonUser::join('button_page', 'button_page.button_page_id', '=', 'button_user.button_page_id')
+        ->join('button', 'button.button_id', '=', 'button_page.button_id')
+        ->where('button_user.user_id', '=', $user_id)
+        ->select('button_page.*', 'button.*', 'button_user.*', 'button.id as bID')->orderBy('button.position')->get();
+        // dd($isButton);
+
         $company_list = Company::all();
         $country_list = Country::all();
         $part_list = Part::all();
@@ -24,7 +35,8 @@ class ReportsController extends Controller
             'company_list' => $company_list,
             'country_list' => $country_list,
             'part_list' => $part_list,
-            'city_list' => $city_list
+            'city_list' => $city_list,
+            'isButton' => $isButton
         ]);
     }
     
@@ -554,7 +566,7 @@ class ReportsController extends Controller
         }
         $sql .= " and w.customer_id=cp.customer_id and cp.billing_address_id=b.billing_address_id and cp.company_id=c.company_id order by 2, 3";
         $top_result = DB::select($sql);
-
+        $result = [];
         foreach($top_result as $key => $top) {
             $temp = "";
             if(isset($request->part_id) && strlen($request->part_id) > 0) {
