@@ -44,6 +44,14 @@
          </button>
       </div>
    @endif
+   @if($error = Session::get('error'))
+      <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert" style="position: absolute; right: 15px; top: 0px; z-index: 9999;">
+         {{ $error }}
+         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+         </button>
+      </div>
+   @endif
 
    <div class="vh-100 d-flex align-items-center">
        <div class="container">

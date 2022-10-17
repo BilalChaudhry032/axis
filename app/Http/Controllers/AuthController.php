@@ -51,12 +51,12 @@ class AuthController extends Controller
             } else {
                 Session::flush();
                 Auth::logout();
-                return redirect('/login')->with('message', 'Authentication Failed!');
+                return redirect('/login')->with('error', 'Authentication Failed!');
             }
         } else {
             Session::flush();
             Auth::logout();
-            return redirect('/login')->with('message', 'Authentication Failed!');
+            return redirect('/login')->with('error', 'Authentication Failed!');
         }
     }
 

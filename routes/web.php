@@ -28,6 +28,15 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     });
 
     Route::get('/users', [UsersController::class, 'index'])->name('users');
+    Route::get('/users/list', [UsersController::class, 'getUsers'])->name('users.list');//AJAX
+    Route::post('/user', [UsersController::class, 'store']);
+    Route::get('/get-user', [UsersController::class, 'getUser']);
+    Route::put('/user/{user_id}', [UsersController::class, 'edit']);
+    Route::delete('/user/{user_id}', [UsersController::class, 'destroy']);
+
+    Route::get('/get-page-user', [UsersController::class, 'getPageUser'])->name('page.user');//AJAX
+    Route::post('/update-user-rights', [UsersController::class, 'updateUserRights']);
+    Route::get('/get-button-user', [UsersController::class, 'getButtoneUser'])->name('button.user');//AJAX
 
     Route::get('/vendor', [VendorController::class, 'index'])->name('vendor');
     Route::get('/vendor/list', [VendorController::class, 'getVendors'])->name('vendor.list');//AJAX

@@ -189,7 +189,7 @@
            </div>
           </div>
           <div class="col-lg-12">
-           <div class="button-group mt-30 mt-xl-n5">
+           <div class="button-group mt-30">
             <button type="submit" class="btn long">Generate Report</button>
            </div>
           </div>
