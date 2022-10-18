@@ -22,6 +22,34 @@ class PaymentController extends Controller
     public function getPayments(Request $request) {
         if($request->ajax()) {
 
+            // $sql = "select p.payment_id, p.workorder_id, 
+            // (select sum(wp.quantity*wp.unit_price) from workorder_part wp, part pa where wp.workorder_id=p.workorder_id and wp.part_id=pa.part_id),
+            //  m.name, DATE_FORMAT(p.payment_date, '%d-%m-%Y'), p.payment_amount, p.bank_name, p.cheque_num, DATE_FORMAT(p.cheque_date, '%d-%m-%Y'), p.cheque_amount, p.received from payment p, payment_method m where p.payment_amount > 0 and p.payment_method_id=m.payment_method_id";
+            // $payments = DB::select($sql);
+
+            // $payments = Payment::join('payment_method', 'payment_method.payment_method_id', '=', 'payment.payment_method_id')
+            // ->join('workorder_part', 'workorder_part.workorder_id', '=', 'payment.workorder_id')
+            // ->join('part', 'workorder_part.part_id', '=', 'part.part_id')
+            // ->where([
+            //     ['payment.payment_amount', '>', 0],
+            //     ['payment.payment_method_id', '=', 'payment_method.payment_method_id']
+            // ])
+            // ->select(
+            //     'payment.payment_id',
+            //     'payment.workorder_id',
+            //     DB::raw('sum(workorder_part.quantity*workorder_part.unit_price) as invoice_amount'),
+            //     'payment_method.name',
+            //     DB::raw('DATE_FORMAT(payment.payment_date, "%d-%m-%Y") as payment_date'),
+            //     DB::raw('DATE_FORMAT(payment.cheque_date, "%d-%m-%Y") as cheque_date'),
+            //     'payment.payment_amount', 
+            //     'payment.bank_name', 
+            //     'payment.cheque_num',
+            //     'payment.cheque_amount', 
+            //     'payment.received'
+            // )->groupby('payment.workorder_id');
+
+            // dd($payments->get());
+
             $payments = Payment::where('payment_amount', '>', 0)->select('payment.*');
 
             return DataTables::of($payments)

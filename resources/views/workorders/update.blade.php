@@ -47,7 +47,7 @@
           </div>
         </div>
       </div>
-
+      
       <div id="smartwizard">
         <ul class="nav">
           <li>
@@ -567,20 +567,36 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col-12">
+                <div class="col-lg-6 col-xl-4 mt-3">
                   <!-- Dropzone Start -->
-                  <form action="#" id="dropzone01" class="dropzone" method="post" enctype="multipart/form-data">
+                  {{-- <form action="#" id="dropzone01" class="dropzone" method="post" enctype="multipart/form-data">
                     <div class="d-flex justify-content-center flex-column align-items-center align-self-center" data-dz-message>
                       <div class="dz-message bold c2 font-20 mb-3">Click or Drop files here to upload.</div>
                       <div class="upload-icon">
                         <img src="{{ asset('assets/img/svg/upload-down.svg') }}" alt="" class="svg">
                       </div>
                     </div>
-                  </form>
+                  </form> --}}
                   <!-- Dropzone End -->
-                </div>
-                <div class="col-12">
                   
+                  <form action="{{route('fileUpload')}}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="workorder_id" value="{{ $workorder_id }}">
+                    @csrf
+                    <div class="custom-file">
+                      <input type="file" name="file" class="custom-file-input" id="chooseFile">
+                      <label class="custom-file-label" for="chooseFile">Select file</label>
+                    </div>
+                    <button type="submit" name="submit" class="btn btn-primary mt-4">
+                      Upload Files
+                    </button>
+                  </form>
+                </div>
+                <div class="col-lg-6 col-xl-4 offset-xl-4">
+                  <ul>
+                    @foreach ($woFiles as $woFile)
+                    <li><a href="{{ url('/reports/'.$woFile->file_name) }}">{{ $woFile->file_name }}</a></li>
+                    @endforeach
+                  </ul>
                 </div>
               </div>
             </div>
@@ -1339,6 +1355,11 @@
       });
     });
     
+    $('#chooseFile').change(function() {
+      var i = $(this).next('label').clone();
+      var file = $('#chooseFile')[0].files[0].name;
+      $(this).next('label').text(file);
+    });
     
   });
 </script>

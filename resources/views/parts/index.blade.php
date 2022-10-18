@@ -3,24 +3,10 @@
 
 <div class="row">
    <div class="col-xl-12">
-
-      <div class="card mb-30">
-         <div class="card-body">
-            <div class="d-flex justify-content-between">
-               <form action="{{ url('/parts') }}" class="search-form flex-grow">
-                  <div class="theme-input-group style--two">
-                     <input type="text" class="theme-input-style" placeholder="Search Here" name="search" value="{{ $search }}">
-
-                     <button type="submit"><img src="{{ asset('/assets/img/svg/search-icon.svg') }}" alt="" class="svg"></button>
-                  </div>
-               </form>
-            </div>
-         </div>
-      </div>
-
+      
       <div class="card mb-30">
          <div class="card-body pb-0">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between align-items-center">
                <div class="title-content">
                   <h4 class="mb-2">Part</h4>
                </div>
@@ -29,171 +15,199 @@
                </div>
             </div>
          </div>
-         @if (count($parts) > 0)
+         
          <div class="table-responsive">
-            <table class="invoice-list">
-                  <thead>
-                     <tr>
-                        <th style="width: 100px">
-                           SR#
-                        </th>
-                        <th>Part Name</th>
-                        <th>Unit Price</th>
-                        <th>Description</th>
-                        <th>Actions</th>
-                     </tr>
-                  </thead>
-                  <tbody>
-                     @foreach ($parts as $part)
-                     <tr>
-                        <td>
-                           {{ (($parts->currentPage() -1) * $parts->perPage()) + $loop->index + 1 }}
-                        </td>
-                        <td>{{ $part->name }}</td>
-                        <td>{{ $part->unit_price }}</td>
-                        <td>{{ $part->description }}</td>
-                        <td>
-                              <!-- Dropdown Button -->
-                              <div class="dropdown-button">
-                                 <a href="#" class="d-flex align-items-center justify-content-end" data-toggle="dropdown">
-                                    <div class="menu-icon mr-0">
-                                          <span></span>
-                                          <span></span>
-                                          <span></span>
-                                    </div>
-                                 </a>
-                                 <div class="dropdown-menu dropdown-menu-right">
-                                    <a href="" data-toggle="modal" data-target="#part_edit_modal_{{ $part->part_id }}">Edit</a>
-                                    
-                                    <a href="" data-toggle="modal" data-target="#part_delete_modal_{{ $part->part_id }}">Delete</a>
-                                 </div>
-                              </div>
-                              <!-- End Dropdown Button -->
-                        </td>
-                     </tr>
-
-                     <!-- Modal Create -->
-                     <div class="modal fade" id="part_create_modal" tabindex="-1" role="dialog" aria-labelledby="part_create_label" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                           <div class="modal-content">
-                              <div class="modal-header">
-                              <h5 class="modal-title" id="part_create_label">Add New Part</h5>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                 <span aria-hidden="true">&times;</span>
-                              </button>
-                              </div>
-                              <form action="{{ url('/parts') }}" method="POST">
-                                 @csrf
-                                 <div class="modal-body">
-                                    <div class="row">
-                                       <div class="col-lg-8">
-                                          <div class="form-group">
-                                             <label for="message-text" class="col-form-label">Part Name</label>
-                                             <input class="form-control" required name="name">
-                                          </div>
-                                       </div>
-                                       <div class="col-lg-4">
-                                          <div class="form-group">
-                                             <label for="message-text" class="col-form-label">Unit Price</label>
-                                             <input type="number" class="form-control" required name="unit_price">
-                                          </div>
-                                       </div>
-                                       <div class="col-12">
-                                          <div class="form-group">
-                                             <label for="message-text" class="col-form-label">Description</label>
-                                             <textarea class="form-control" name="description" rows="3"></textarea>
-                                          </div>
-                                       </div>
-                                    </div>
-                                 </div>
-                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Add Part</button>
-                                 </div>
-                              </form>
-                           </div>
-                        </div>
-                     </div>
-
-                     <!-- Modal Edit -->
-                     <div class="modal fade" id="part_edit_modal_{{ $part->part_id }}" tabindex="-1" role="dialog" aria-labelledby="part_edit_label" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                           <div class="modal-content">
-                              <div class="modal-header">
-                              <h5 class="modal-title" id="part_edit_label">Update Part</h5>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                 <span aria-hidden="true">&times;</span>
-                              </button>
-                              </div>
-                              <form action="{{ url('/parts/'.$part->part_id) }}" method="POST">
-                                 @csrf
-                                 @method('PUT')
-                                 <div class="modal-body">
-                                    <div class="row">
-                                       <div class="col-lg-8">
-                                          <div class="form-group">
-                                             <label for="message-text" class="col-form-label">Part Name</label>
-                                             <input class="form-control" required name="name" value="{{ $part->name }}">
-                                          </div>
-                                       </div>
-                                       <div class="col-lg-4">
-                                          <div class="form-group">
-                                             <label for="message-text" class="col-form-label">Unit Price</label>
-                                             <input type="number" class="form-control" required name="unit_price" value="{{ $part->unit_price }}">
-                                          </div>
-                                       </div>
-                                       <div class="col-12">
-                                          <div class="form-group">
-                                             <label for="message-text" class="col-form-label">Description</label>
-                                             <textarea class="form-control" name="description" rows="3">{{ $part->description }}</textarea>
-                                          </div>
-                                       </div>
-                                    </div>
-                                 </div>
-                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Save changes</button>
-                                 </div>
-                              </form>
-                           </div>
-                        </div>
-                     </div>
-
-                     <!-- Modal Delete -->
-                     <div class="modal fade" id="part_delete_modal_{{ $part->part_id }}" tabindex="-1" role="dialog" aria-labelledby="part_delete_label" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                           <div class="modal-content">
-                              <form action="{{ url('/parts/'.$part->part_id) }}" method="POST">
-                                 @csrf
-                                 @method('DELETE')
-                                 <div class="modal-body">
-                                    <h4>Are you sure, you want to Delete this Part?</h4>
-                                 </div>
-                                 <div class="modal-footer border-0">
-                                    <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary bg-danger">Delete</button>
-                                 </div>
-                              </form>
-                           </div>
-                        </div>
-                     </div>
-
-                     @endforeach
-                  </tbody>
+            <table class="" id="parts_table">
+               <thead>
+                  <tr>
+                     <th style="width: 100px">
+                        SR#
+                     </th>
+                     <th>Part Name</th>
+                     <th>Unit Price</th>
+                     <th>Description</th>
+                     <th>Actions</th>
+                  </tr>
+               </thead>
+               <tbody>
+               </tbody>
             </table>
             <!-- End Invoice List Table -->
          </div>
-         @else
-            <div class="px-3 pb-3 text-center">
-               <p class="">No Part Found!</p>
-            </div>
-         @endif
       </div>
       
-      {!! $parts->links('pagination::bootstrap-5') !!}
-
-
    </div>
 </div>
+
+<!-- Modal Create -->
+<div class="modal fade" id="part_create_modal" tabindex="-1" role="dialog" aria-labelledby="part_create_label" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="part_create_label">Add New Part</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <form action="{{ url('/parts') }}" method="POST">
+            @csrf
+            <div class="modal-body">
+               <div class="row">
+                  <div class="col-lg-8">
+                     <div class="form-group">
+                        <label for="message-text" class="col-form-label">Part Name</label>
+                        <input class="form-control" required name="name">
+                     </div>
+                  </div>
+                  <div class="col-lg-4">
+                     <div class="form-group">
+                        <label for="message-text" class="col-form-label">Unit Price</label>
+                        <input type="number" class="form-control" required name="unit_price">
+                     </div>
+                  </div>
+                  <div class="col-12">
+                     <div class="form-group">
+                        <label for="message-text" class="col-form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+               <button type="submit" class="btn btn-primary">Add Part</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+
+<!-- Modal Edit -->
+<div class="modal fade" id="part_edit_modal" tabindex="-1" role="dialog" aria-labelledby="part_edit_label" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="part_edit_label">Update Part</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <form action="" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="modal-body">
+               <div class="row">
+                  <div class="col-lg-8">
+                     <div class="form-group">
+                        <label for="message-text" class="col-form-label">Part Name</label>
+                        <input class="form-control" required name="name" >
+                     </div>
+                  </div>
+                  <div class="col-lg-4">
+                     <div class="form-group">
+                        <label for="message-text" class="col-form-label">Unit Price</label>
+                        <input type="number" class="form-control" required name="unit_price" >
+                     </div>
+                  </div>
+                  <div class="col-12">
+                     <div class="form-group">
+                        <label for="message-text" class="col-form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3"></textarea>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+               <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+
+<!-- Modal Delete -->
+<div class="modal fade" id="part_delete_modal" tabindex="-1" role="dialog" aria-labelledby="part_delete_label" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+         <form action="" method="POST">
+            @csrf
+            @method('DELETE')
+            <div class="modal-body">
+               <h4>Are you sure, you want to Delete this Part?</h4>
+            </div>
+            <div class="modal-footer border-0">
+               <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+               <button type="submit" class="btn btn-primary bg-danger">Delete</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+
+@endsection
+
+@section('pageScript')
+
+<script>
+   $(document).ready(function() {
+      
+      $(function () {
+         
+         var table = $('#parts_table').DataTable({
+            processing: true,
+            serverSide: true,
+            paging: true,
+            pageLength: 10,
+            order: [[1, 'asc']],
+            ajax: "{{ route('parts.list') }}",
+            columns: [
+               {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+               {data: 'name', name: 'name'},
+               {data: 'unit_price', name: 'unit_price'},
+               {data: 'description', name: 'description'},
+               {
+                  data: 'action', 
+                  name: 'action', 
+                  orderable: false, 
+                  searchable: false
+               },
+            ]
+         });
+         
+      });
+      
+      $('.table-responsive').on('click', '.part_edit_modal_btn', function(e) {
+         e.preventDefault();
+         const APP_URL = {!! json_encode(url('/')) !!};
+         let id = $(this).attr('id').split('_');
+         var url = "{{url('/get-part')}}";
+         $.ajax({
+            type:'GET',
+            url: url,
+            data: {
+               part_id: id[1],
+            },
+            success:function(data) {
+               $('#part_edit_modal form').attr('action', APP_URL+'/parts/'+id[1]);
+               $('#part_edit_modal input[name="name"]').val(data.response.name);
+               $('#part_edit_modal input[name="unit_price"]').val(data.response.unit_price);
+               $('#part_edit_modal textarea[name="description"]').text(data.response.description);
+               $('#part_edit_modal').modal('show');
+            }
+         });
+      });
+
+      $('.table-responsive').on('click', '.part_delete_modal_btn', function(e) {
+         e.preventDefault();
+         const APP_URL = {!! json_encode(url('/')) !!};
+         let id = $(this).attr('id').split('_');
+
+         $('#part_delete_modal form').attr('action', APP_URL+'/parts/'+id[1]);
+         $('#part_delete_modal').modal('show');
+      });
+      
+   });
+</script>
 
 @endsection

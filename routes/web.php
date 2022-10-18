@@ -72,17 +72,23 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     Route::delete('/contact/{contact_id}', [CustomersController::class, 'destroyContact']);
 
     Route::get('/company', [CompanyController::class, 'index'])->name('Company')->middleware([UserPermissions::class]);
+    Route::get('/company/list', [CompanyController::class, 'getCompanies'])->name('company.list');//AJAX
     Route::post('/company', [CompanyController::class, 'store']);
+    Route::get('/get-company', [CompanyController::class, 'getCompany']);//AJAX
     Route::put('/company/{company_id}', [CompanyController::class, 'update']);
     Route::delete('/company/{company_id}', [CompanyController::class, 'destroy']);
 
     Route::get('/billing-address', [BillingAddressController::class, 'index'])->name('Billing Address')->middleware([UserPermissions::class]);
+    Route::get('/billing-address/list', [BillingAddressController::class, 'getBillingAddresses'])->name('billingAddress.list');//AJAX
     Route::post('/billing-address', [BillingAddressController::class, 'store']);
+    Route::get('/get-billing-address', [BillingAddressController::class, 'getBillingAddress']);//AJAX
     Route::put('/billing-address/{billing_address_id}', [BillingAddressController::class, 'update']);
     Route::delete('/billing-address/{billing_address_id}', [BillingAddressController::class, 'destroy']);
 
     Route::get('/parts', [PartsController::class, 'index'])->name('Parts')->middleware([UserPermissions::class]);
+    Route::get('/parts/list', [PartsController::class, 'getParts'])->name('parts.list');//AJAX
     Route::post('/parts', [PartsController::class, 'store']);
+    Route::get('/get-part', [PartsController::class, 'getPart']);//AJAX
     Route::put('/parts/{part_id}', [PartsController::class, 'update']);
     Route::delete('/parts/{part_id}', [PartsController::class, 'destroy']);
 
@@ -110,6 +116,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         Route::put('/workorders/part/{wo_part_id}', [WorkOrderController::class, 'updateParts']);
         Route::delete('/workorders/part/{wo_part_id}', [WorkOrderController::class, 'destroyParts']);
         Route::get('/get-product', [WorkOrderController::class, 'getProduct']);//AJAX
+
+        Route::post('/upload-file', [WorkOrderController::class, 'fileUpload'])->name('fileUpload');
 
         Route::post('/workorders/labors', [WorkOrderController::class, 'storeLabors']);
         Route::put('/workorders/labor/{wo_labor_id}', [WorkOrderController::class, 'updateLabors']);

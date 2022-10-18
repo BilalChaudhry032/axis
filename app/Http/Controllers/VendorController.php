@@ -14,7 +14,8 @@ class VendorController extends Controller
 
     public function getVendors(Request $request) {
         if($request->ajax()) {
-            $vendors = Vendor::orderByDesc('vendor_id')->select('vendor_id', 'name');
+            $vendors = Vendor::select('vendor_id', 'name');
+
             return DataTables::of($vendors)
                 ->addIndexColumn()
                 ->addColumn('action', function($row){

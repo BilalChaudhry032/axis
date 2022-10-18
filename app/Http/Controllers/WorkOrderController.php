@@ -13,6 +13,7 @@ use App\Models\Payment;
 use App\Models\PaymentMethod;
 use App\Models\Vendor;
 use App\Models\Workorder;
+use App\Models\WorkorderFile;
 use App\Models\WorkorderLabor;
 use App\Models\WorkorderPart;
 use Carbon\Carbon;
@@ -155,6 +156,8 @@ class WorkOrderController extends Controller
                     
                     public function editWorkorder($workorder_id) {
                         $workOrder = Workorder::where('workorder_id', '=', $workorder_id)->first();
+
+                        $woFiles = WorkorderFile::where('workorder_id', '=', $workorder_id)->get();
                         
                         $customer_address = CustomerParent::where('customer_id', '=', $workOrder->customer_id)->first();
                         
@@ -283,7 +286,9 @@ class WorkOrderController extends Controller
                                     'employee_list' => $employee_list,
                                     
                                     'workorder_payments' => $workorder_payments,
-                                    'payment_method_list' => $payment_method_list
+                                    'payment_method_list' => $payment_method_list,
+
+                                    'woFiles' => $woFiles,
                                     
                                 ]);
                             }
@@ -561,6 +566,26 @@ class WorkOrderController extends Controller
                                                 'company_name' => $company_name
                                             ), 200);
                                         }
+
+    public function fileUpload(Request $req){
+        // dd($req);
+        $req->validate([
+        'file' => 'required'
+        ]);
+        $fileModel = new WorkorderFile();
+        if($req->file()) {
+            $fileName = 'report_'.$req->workorder_id.'_'.time().'.'.$req->file->getClientOriginalExtension();
+            $filePath = $req->file('file')->move('woReports', $fileName, 'public');
+        
+            $fileModel->file_name = $fileName;
+            $fileModel->workorder_id = $req->workorder_id;
+
+            $fileModel->save();
+            return Redirect::to(URL::previous() . "#step-report")
+            ->with('message','File has been uploaded.')
+            ->with('file', $fileName);
+        }
+   }
                                         
-                                    }
+}
                                     

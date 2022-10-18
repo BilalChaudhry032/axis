@@ -54,6 +54,7 @@
             serverSide: true,
             paging: true,
             pageLength: 10,
+            order: [[2, 'desc']],
             ajax: "{{ route('workorders.list') }}",
             columns: [
                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
