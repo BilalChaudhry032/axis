@@ -38,21 +38,21 @@
 
 <!-- Modal Delete -->
 <div class="modal fade" id="customer_delete_modal" tabindex="-1" role="dialog" aria-labelledby="customer_delete_label" aria-hidden="true">
- <div class="modal-dialog modal-dialog-centered" role="document">
-  <div class="modal-content">
-   <form action="" method="POST">
-    @csrf
-    @method('DELETE')
-    <div class="modal-body">
-     <h4>Are you sure, you want to Delete this Customer?</h4>
-    </div>
-    <div class="modal-footer border-0">
-     <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
-     <button type="submit" class="btn btn-primary bg-danger">Delete</button>
-    </div>
-   </form>
-  </div>
- </div>
+   <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+         <form action="" method="POST">
+            @csrf
+            @method('DELETE')
+            <div class="modal-body">
+               <h4>Are you sure, you want to Delete this Customer?</h4>
+            </div>
+            <div class="modal-footer border-0">
+               <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+               <button type="submit" class="btn btn-primary bg-danger">Delete</button>
+            </div>
+         </form>
+      </div>
+   </div>
 </div>
 @endsection
 
@@ -60,7 +60,7 @@
 
 <script>
    $(document).ready(function() {
-
+      
       $(function () {
          
          var table = $('#customers_table').DataTable({
@@ -70,28 +70,28 @@
             pageLength: 10,
             ajax: "{{ route('customers.list') }}",
             columns: [
-               {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-               {data: 'company_name', name: 'company.name'},
-               {data: 'billing_address_name', name: 'billing_address.name'},
-               {data: 'postal_address', name: 'customer_parent.postal_address'},
-               {data: 'city', name: 'customer_parent.city'},
-               {data: 'contacts_persons', name: 'contacts_persons', orderable: true, searchable: true},
-               {
-                  data: 'action', 
-                  name: 'action', 
-                  orderable: false, 
-                  searchable: false
-               },
+            {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+            {data: 'company_name', name: 'company_name'},
+            {data: 'billing_address_name', name: 'billing_address_name'},
+            {data: 'postal_address', name: 'postal_address'},
+            {data: 'city', name: 'city'},
+            {data: 'contacts_persons', name: 'contacts_persons'},
+            {
+               data: 'action',
+               name: 'action',
+               orderable: false,
+               searchable: false
+            },
             ]
          });
          
       });
-
+      
       $('.table-responsive').on('click', '.edit-customer', function(e) {
          e.preventDefault();
          const APP_URL = {!! json_encode(url('/')) !!};
          let id = $(this).attr('id').split('_');
-
+         
          window.location.href = APP_URL+'/customers/'+id[1]+'/update';
       });
       
@@ -99,7 +99,7 @@
          e.preventDefault();
          const APP_URL = {!! json_encode(url('/')) !!};
          let id = $(this).attr('id').split('_');
-
+         
          $('#customer_delete_modal form').attr('action', APP_URL+'/customer/'+id[1]);
          $('#customer_delete_modal').modal('show');
       });

@@ -22,26 +22,53 @@ class CustomersController extends Controller
     public function getCustomers(Request $request) {
         if($request->ajax()) {
 
+            // $customers = CustomerParent::join('company', 'customer_parent.company_id', "=", "company.company_id")
+            //     ->join('billing_address', 'customer_parent.billing_address_id', "=", "billing_address.billing_address_id")
+            //     ->join('customer_child', 'customer_child.customer_id', '=', 'customer_parent.customer_id')
+            //     ->where('customer_child.active', '=', 1)
+            //     ->select("company.name as company_name", "billing_address.name as billing_address_name", "customer_parent.postal_address", "customer_parent.city", "customer_parent.customer_id", "customer_child.last_name");
+
+            $row = [];
+
             $customers = CustomerParent::join('company', 'customer_parent.company_id', "=", "company.company_id")
                 ->join('billing_address', 'customer_parent.billing_address_id', "=", "billing_address.billing_address_id")
-                ->select("company.name as company_name", "billing_address.name as billing_address_name", "customer_parent.postal_address", "customer_parent.city", "customer_parent.customer_id");
+                ->select("company.name as company_name", "billing_address.name as billing_address_name", "customer_parent.postal_address", "customer_parent.city", "customer_parent.customer_id")->get();
 
-            return DataTables::of($customers)
-                ->addIndexColumn()
-                ->addColumn('contacts_persons', function($row){
-                    $persons = CustomerChild::where([
-                        ['customer_id', '=', $row->customer_id],
-                        ['active', '=', 1]
-                    ])->select('last_name')->get();
-                    $html = '';
-                    foreach($persons as $key=>$person) {
-                        $html .= $person->last_name;
-                        if(count($persons) > 1 && $key < count($persons)-1) {
-                            $html .= ', ';
-                        }
+            foreach($customers as $i => $customer) {
+                $persons = CustomerChild::where([
+                    ['customer_id', '=', $customer->customer_id],
+                    ['active', '=', 1]
+                ])->select('last_name')->get();
+                // dd($persons);
+                $html = '';
+                foreach($persons as $j=>$person) {
+                    $html .= $person->last_name;
+                    if(count($persons) > 1 && $j < count($persons)-1) {
+                        $html .= ', ';
                     }
-                    return $html;
-                })
+                }
+                $customer->contacts_persons=$html;
+                $row[$i] = $customer;
+            }
+    
+
+            return DataTables::of($row)
+                ->addIndexColumn()
+                // ->addColumn('contacts_persons', function($row){
+                //     $persons = CustomerChild::where([
+                //         ['customer_id', '=', $row->customer_id],
+                //         ['active', '=', 1]
+                //     ])->select('last_name')->get();
+                //     // dd($persons);
+                //     $html = '';
+                //     foreach($persons as $key=>$person) {
+                //         $html .= $person->last_name;
+                //         if(count($persons) > 1 && $key < count($persons)-1) {
+                //             $html .= ', ';
+                //         }
+                //     }
+                //     return $html;
+                // })
                 ->addColumn('action', function($row){
                     $actionBtn = '<div class="dropdown-button">
                     <a href="#" class="d-flex align-items-center justify-content-end" data-toggle="dropdown">
