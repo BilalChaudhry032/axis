@@ -431,8 +431,10 @@ class WorkOrderController extends Controller
                                 $sql = "select t.workorder_id, t.child_id, t.customer_id, t.employee_id, t.po_num, DATE_FORMAT(t.date_received, '%d/%m/%Y') as date_received, t.report_name, t.serial_num, t.problem_desc, t.country, DATE_FORMAT(t.date_delivered, '%d/%m/%Y') as date_delivered, t.sales_tax_rate, b.name as bname, c.name as cname, t.reference_num from workorder t, customer_parent p, company c, billing_address b where t.workorder_id=$workorder_id and t.customer_id=p.customer_id and p.company_id=c.company_id and p.billing_address_id=b.billing_address_id";
                                 $row = DB::select($sql)[0];
 
-                                $sql = "select * from customer_parent p, customer_child c where p.customer_id=".$row->customer_id." and p.customer_id=c.customer_id and c.child_id=".$row->child_id;
-                                $customer = DB::select($sql)[0];
+                                if(isset($row->child_id) && strlen($row->child_id) > 0 && isset($row->customer_id) && strlen($row->customer_id) > 0) {
+                                    $sql = "select * from customer_parent p, customer_child c where p.customer_id=".$row->customer_id." and p.customer_id=c.customer_id and c.child_id=".$row->child_id;
+                                    $customer = DB::select($sql)[0];
+                                }
 
                                 $sql = "select p.name, wp.quantity, wp.us_price, wp.exchange_rate, wp.unit_price from workorder_part wp, part p where wp.workorder_id=$workorder_id and wp.part_id=p.part_id";
                                 $products = DB::select($sql);
