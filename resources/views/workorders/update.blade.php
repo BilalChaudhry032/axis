@@ -594,7 +594,7 @@
                 <div class="col-lg-6 col-xl-4 offset-xl-4">
                   <ul>
                     @foreach ($woFiles as $woFile)
-                    <li><a href="{{ url('/reports/'.$woFile->file_name) }}">{{ $woFile->file_name }}</a></li>
+                    <li><a href="{{ url('/woReports/'.$woFile->file_name) }}">{{ $woFile->file_name }}</a></li>
                     @endforeach
                   </ul>
                 </div>

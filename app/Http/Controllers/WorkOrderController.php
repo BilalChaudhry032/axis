@@ -43,6 +43,7 @@ class WorkOrderController extends Controller
                 return DataTables::of($workOrders)
                 ->addIndexColumn()
                 ->addColumn('action', function($row){
+                    $incoive = url('/workorder/'.$row->workorder_id.'/invoice');
                     $actionBtn = '<div class="dropdown-button">
                     <a href="#" class="d-flex align-items-center justify-content-end" data-toggle="dropdown">
                     <div class="menu-icon mr-0">
@@ -52,6 +53,7 @@ class WorkOrderController extends Controller
                     </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
+                    <a href="'.$incoive.'" target="_blank">Invoice</a>
                     <a href="#" class="edit-workorder" id="edit_'.$row->workorder_id.'">Edit</a>
                     <a href="#" class="cancel-workorder" id="cancel_'.$row->workorder_id.'">Cancel</a>
                     <a href="#" class="archive-workorder" id="archive_'.$row->workorder_id.'">Archive</a>
@@ -156,7 +158,7 @@ class WorkOrderController extends Controller
                     
                     public function editWorkorder($workorder_id) {
                         $workOrder = Workorder::where('workorder_id', '=', $workorder_id)->first();
-
+                        
                         $woFiles = WorkorderFile::where('workorder_id', '=', $workorder_id)->get();
                         
                         $customer_address = CustomerParent::where('customer_id', '=', $workOrder->customer_id)->first();
@@ -220,6 +222,7 @@ class WorkOrderController extends Controller
                                 $report_name = (isset($workOrder) ? $workOrder->report_name : '');
                                 $vendor_id = (isset($workOrder) ? $workOrder->vendor_id : '');
                                 $discount = (isset($workOrder) ? $workOrder->discount : '');
+                                // dd($discount);
                                 $sales_tax_rate = (isset($workOrder) ? $workOrder->sales_tax_rate : '');
                                 $financial = (isset($workOrder) ? $workOrder->financial : '');
                                 
@@ -227,6 +230,7 @@ class WorkOrderController extends Controller
                                 $postal_address = (isset($customer_address) ? $customer_address->postal_address : '');
                                 $company_id = (isset($customer_address) ? $customer_address->company_id : '');
                                 
+                                $sub_total = $sub_total - ( $sub_total * $discount / 100 );
                                 $amount_due = $sub_total - $payments;
                                 $sales_tax = $sub_total*$sales_tax_rate/100;
                                 $order_total = $sub_total+$sales_tax;
@@ -287,307 +291,337 @@ class WorkOrderController extends Controller
                                     
                                     'workorder_payments' => $workorder_payments,
                                     'payment_method_list' => $payment_method_list,
-
+                                    
                                     'woFiles' => $woFiles,
                                     
                                 ]);
                             }
                             public function updateWorkorder(Request $request, $workorder_id) {
-                                
-                                $workOrder = Workorder::where('workorder_id', '=', $workorder_id)->first();
-                                
-                                Workorder::where('workorder_id', '=', $workorder_id)->update([
-                                    'date_received' => Carbon::parse($request->date_received)->format('Y-m-d'),
-                                    'po_num' => $request->po_num,
-                                    'reference_num' => $request->reference_num,
-                                    'branch' => $request->branch,
-                                    'country' => $request->country,
-                                    'serial_num' => $request->serial_num,
-                                    'problem_desc' => $request->problem_desc,
-                                    'child_id' => $request->contact_person,
-                                    'report_name' => $request->report_name,
-                                    'discount' => $request->discount,
-                                    'sales_tax_rate' => $request->sales_tax_rate,
-                                    'financial' => $request->financial,
-                                    'hardcopy_delivered' => $request->hardcopy_delivered ? 1 : 0,
-                                    'date_delivered' => Carbon::parse($request->date_delivered)->format('Y-m-d'),
-                                    'vendor_id' => $request->vendor_id,
-                                    
-                                ]);
-                                
-                                CustomerParent::where('customer_id', '=', $workOrder->customer_id)->update([
-                                    'billing_address_id' => $request->billing_address,
-                                    'company_id' => $request->company_id,
-                                    'postal_address' => $request->postal_address,
-                                    
-                                ]);
-                                
-                                
-                                return Redirect::to(URL::previous() . "#step-workorder")->with('message', 'Workorder updated successfully!');
-                            }
-                            
-                            public function storeParts(Request $request) {
                                 // dd($request);
-                                WorkorderPart::create([
-                                    'workorder_id' => $request->workorder_id,
-                                    'part_id' => $request->part_id,
-                                    'quantity' => $request->quantity,
-                                    'unit_price' => $request->unit_price,
-                                    'us_price' => $request->us_price,
-                                    'exchange_rate' => $request->exchange_rate
-                                ]);
+                                $sales_tax_rate = 0;
                                 
-                                return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part added successfully!');
-                            }
-                            public function updateParts(Request $request, $wo_part_id) {
-                                // dd($request);
-                                WorkorderPart::where('wo_part_id', '=', $wo_part_id)->update([
-                                    'workorder_id' => $request->workorder_id,
-                                    'part_id' => $request->part_id,
-                                    'quantity' => $request->quantity,
-                                    'unit_price' => $request->unit_price,
-                                    'us_price' => $request->us_price,
-                                    'exchange_rate' => $request->exchange_rate
-                                ]);
-                                
-                                return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part updated successfully!');
-                            }
-                            public function destroyParts($wo_part_id) {
-                                WorkorderPart::where('wo_part_id', '=', $wo_part_id)->delete();
-                                
-                                return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part deleted successfully!');
-                            }
-                            
-                            public function storeLabors(Request $request) {
-                                // dd($request);
-                                WorkorderLabor::create([
-                                    'workorder_id' => $request->workorder_id,
-                                    'employee_id' => $request->technician_id,
-                                    'billable_hours' => $request->billable_hours,
-                                    'hourly_rate' => $request->hourly_rate,
-                                    'comments' => $request->comments
-                                ]);
-                                
-                                return Redirect::to(URL::previous() . "#step-labor")->with('message', 'Labor added successfully!');
-                            }
-                            public function updateLabors(Request $request, $wo_labor_id) {
-                                // dd($request);
-                                WorkorderLabor::where('wo_labor_id', '=', $wo_labor_id)->update([
-                                    'workorder_id' => $request->workorder_id,
-                                    'employee_id' => $request->technician_id,
-                                    'billable_hours' => $request->billable_hours,
-                                    'hourly_rate' => $request->hourly_rate,
-                                    'comments' => $request->comments
-                                ]);
-                                
-                                return Redirect::to(URL::previous() . "#step-labor")->with('message', 'Labor updated successfully!');
-                            }
-                            public function destroyLabors($wo_labor_id) {
-                                WorkorderLabor::where('wo_labor_id', '=', $wo_labor_id)->delete();
-                                
-                                return Redirect::to(URL::previous() . "#step-labor")->with('message', 'Labor deleted successfully!');
-                            }
-                            
-                            public function storePayments(Request $request) {
-                                // dd($request);
-                                Payment::create([
-                                    'workorder_id'      => $request->workorder_id,
-                                    'payment_method_id' => $request->payment_method_id,
-                                    'payment_amount'    => $request->payment_amount,
-                                    'payment_date'      => Carbon::parse($request->payment_date)->format('Y-m-d'),
-                                    'cheque_date'       => Carbon::parse($request->cheque_date)->format('Y-m-d'),
-                                    'bank_name'         => $request->bank_name,
-                                    'cheque_num'        => $request->cheque_num,
-                                    'cheque_amount'     => $request->cheque_amount,
-                                    'received'          => $request->received ? 1 : 0
-                                ]);
-                                
-                                return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment added successfully!');
-                            }
-                            public function updatePayments(Request $request, $payment_id) {
-                                // dd($request);
-                                Payment::where('payment_id', '=', $payment_id)->update([
-                                    'workorder_id'      => $request->workorder_id,
-                                    'payment_method_id' => $request->payment_method_id,
-                                    'payment_amount'    => $request->payment_amount,
-                                    'payment_date'      => Carbon::parse($request->payment_date)->format('Y-m-d'),
-                                    'cheque_date'       => Carbon::parse($request->cheque_date)->format('Y-m-d'),
-                                    'bank_name'         => $request->bank_name,
-                                    'cheque_num'        => $request->cheque_num,
-                                    'cheque_amount'     => $request->cheque_amount,
-                                    'received'          => $request->received ? 1 : 0
-                                ]);
-                                
-                                return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment updated successfully!');
-                            }
-                            public function destroyPayments($payment_id) {
-                                Payment::where('payment_id', '=', $payment_id)->delete();
-                                
-                                return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment deleted successfully!');
-                            }
-                            
-                            public function workorderInvoice($workorder_id) {
-                                
-                                $sql = "select t.workorder_id, t.child_id, t.customer_id, t.employee_id, t.po_num, DATE_FORMAT(t.date_received, '%d/%m/%Y') as date_received, t.report_name, t.serial_num, t.problem_desc, t.country, DATE_FORMAT(t.date_delivered, '%d/%m/%Y') as date_delivered, t.sales_tax_rate, b.name as bname, c.name as cname, t.reference_num from workorder t, customer_parent p, company c, billing_address b where t.workorder_id=$workorder_id and t.customer_id=p.customer_id and p.company_id=c.company_id and p.billing_address_id=b.billing_address_id";
-                                $row = DB::select($sql)[0];
-
-                                if(isset($row->child_id) && strlen($row->child_id) > 0 && isset($row->customer_id) && strlen($row->customer_id) > 0) {
-                                    $sql = "select * from customer_parent p, customer_child c where p.customer_id=".$row->customer_id." and p.customer_id=c.customer_id and c.child_id=".$row->child_id;
-                                    $customer = DB::select($sql)[0];
-                                }
-
-                                $sql = "select p.name, wp.quantity, wp.us_price, wp.exchange_rate, wp.unit_price from workorder_part wp, part p where wp.workorder_id=$workorder_id and wp.part_id=p.part_id";
-                                $products = DB::select($sql);
-                                // dd($products);
-                                
-                                $sql = "select sum(p.quantity*p.unit_price) as sub_total from workorder_part p, part pa where p.workorder_id=$workorder_id and p.part_id=pa.part_id";
-                                $sub_total = DB::select($sql)[0];
-                                $sub_total = $sub_total->sub_total;
-                                // dd($sub_total);
-                                
-                                $payments = Payment::where([
-                                    ['workorder_id', '=', $workorder_id],
-                                    ['received', '=', 1]
+                                $customer = CustomerParent::where([
+                                    ['company_id', '=', $request->company_id],
+                                    ['billing_address_id', '=', $request->billing_address]
                                     ])
-                                    ->sum('payment_amount');
-
-                                $date_delivered = (isset($row) ? $row->date_delivered : '');
-                                $customer_id = (isset($row) ? $row->customer_id : '');
-                                $workorder_id = (isset($row) ? $row->workorder_id : '');
-                                $date_received = (isset($row) ? $row->date_received : '');
-                                $po_num = (isset($row) ? $row->po_num : '');
-                                $cname = (isset($row) ? $row->cname : '');
-                                $report_name = (isset($row) ? $row->report_name : '');
-                                $problem_desc = (isset($row) ? $row->problem_desc : '');
-                                $country = (isset($row) ? $row->country : '');
-                                $reference_num = (isset($row) ? $row->reference_num : '');
-
-                                $province = (isset($customer) ? $customer->province : '');
-                                $last_name = (isset($customer) ? $customer->last_name : '');
-                                $contact_title = (isset($customer) ? $customer->contact_title : '');
-                                $postal_address = (isset($customer) ? $customer->postal_address : '');
-                                $city = (isset($customer) ? $customer->city : '');
-                                $telephone = (isset($customer) ? $customer->telephone : '');
-                                $extension = (isset($customer) ? $customer->extension : '');
-                                $direct = (isset($customer) ? $customer->direct : '');
-
-
-                                $sales_tax_rate = (isset($row) ? $row->sales_tax_rate : '');
-                                
-                                $amount_due = $sub_total - $payments;
-                                $sales_tax = $sub_total*$sales_tax_rate/100;
-                                $order_total = $sub_total+$sales_tax;
-                                $amount_due += $sales_tax;
-                                
-                                $sub_total = ($sub_total == 0 ? '0' : number_format($sub_total, 0));
-                                $sales_tax = ($sales_tax == 0 ? '0' : number_format($sales_tax, 0));
-                                $order_total = ($order_total == 0 ? '0' : number_format($order_total, 0));
-                                $payments = ($payments == 0 ? '0' : number_format($payments, 0));
-                                $amount_due = ($amount_due == 0 ? '0' : number_format($amount_due, 0));
-
-                                return view('reports.invoice', [
-                                    'workorder_id' => $workorder_id,
-                                    'province' => $province,
-                                    'date_delivered' => $date_delivered,
-                                    'last_name' => $last_name,
-                                    'customer_id' => $customer_id,
-                                    'contact_title' => $contact_title,
-                                    'date_received' => $date_received,
-                                    'po_num' => $po_num,
-                                    'cname' => $cname,
-                                    'report_name' => $report_name,
-                                    'postal_address' => $postal_address,
-                                    'city' => $city,
-                                    'problem_desc' => $problem_desc,
-                                    'telephone' => $telephone,
-                                    'extension' => $extension,
-                                    'country' => $country,
-                                    'direct' => $direct,
-                                    'reference_num' => $reference_num,
-
-                                    'products' => $products,
-
-                                    'sub_total' => $sub_total,
-                                    'sales_tax_rate' => $sales_tax_rate,
-                                    'sales_tax' => $sales_tax,
-                                    'order_total' => $order_total,
-                                    'payments' => $payments,
-
-                                ]);
-                            }
-                            
-                            // AJAX Functions
-                            public function getProduct() {
-                                $part_id = $_GET['part_id'];
-                                $part_info = Part::where('part_id', '=', $part_id)->select('unit_price')->get();
-                                return response()->json(['msg'=> $part_info], 200);
-                            }
-                            public function getCompanyAddresses() {
-                                $wo_company_id = $_GET['wo_company_id'];
-                                
-                                $company_billing_addresses = CustomerParent::where('company_id', '=', $wo_company_id)
-                                ->join('billing_address', 'billing_address.billing_address_id', '=', 'customer_parent.billing_address_id')
-                                ->select('billing_address.billing_address_id', 'billing_address.name')->get();
-                                
-                                return response()->json(['response'=> $company_billing_addresses], 200);
-                            }
-                            public function getCompanyPersons() {
-                                $wo_company_id = $_GET['wo_company_id'];
-                                $wo_billing_address_id = $_GET['wo_billing_address_id'];
-                                
-                                $company_persons = CustomerParent::where([
-                                    ['company_id', '=', $wo_company_id],
-                                    ['billing_address_id', '=', $wo_billing_address_id]
-                                    ])
-                                    ->join('customer_child', 'customer_child.customer_id', '=', 'customer_parent.customer_id')
-                                    ->select('customer_child.child_id', 'customer_child.first_name', 'customer_child.last_name')->get();
-                                    
-                                    $postal_address = CustomerParent::where([
-                                        ['company_id', '=', $wo_company_id],
-                                        ['billing_address_id', '=', $wo_billing_address_id]
-                                        ])
-                                        ->select('postal_address')->first();
-                                        
-                                        return response()->json(['response'=> $company_persons, $postal_address], 200);
+                                    ->select('customer_id', 'province')->first();
+                                    if($request->taxable){
+                                        if($customer->province == 'Sindh' || $customer->province == 'Sind'){
+                                            $sales_tax_rate = 13;
+                                        }else if($customer->province == 'Punjab'){
+                                            $sales_tax_rate = 16;
+                                        }else{
+                                            $sales_tax_rate = 15;
+                                        }
                                     }
-                                    public function getCompanyHistory() {
+
+                                    $workOrder = Workorder::where('workorder_id', '=', $workorder_id)->first();
+                                    
+                                    Workorder::where('workorder_id', '=', $workorder_id)->update([
+                                        'date_received' => Carbon::parse($request->date_received)->format('Y-m-d'),
+                                        'po_num' => $request->po_num,
+                                        'reference_num' => $request->reference_num,
+                                        'branch' => $request->branch,
+                                        'country' => $request->country,
+                                        'serial_num' => $request->serial_num,
+                                        'problem_desc' => $request->problem_desc,
+                                        'child_id' => $request->contact_person,
+                                        'report_name' => $request->report_name,
+                                        'discount' => $request->discount,
+                                        'sales_tax_rate' => $sales_tax_rate,
+                                        'financial' => $request->financial,
+                                        'hardcopy_delivered' => $request->hardcopy_delivered ? 1 : 0,
+                                        'date_delivered' => Carbon::parse($request->date_delivered)->format('Y-m-d'),
+                                        'vendor_id' => $request->vendor_id,
+                                        
+                                    ]);
+                                    
+                                    CustomerParent::where('customer_id', '=', $workOrder->customer_id)->update([
+                                        'billing_address_id' => $request->billing_address,
+                                        'company_id' => $request->company_id,
+                                        'postal_address' => $request->postal_address,
+                                        
+                                    ]);
+                                    
+                                    
+                                    return Redirect::to(URL::previous() . "#step-workorder")->with('message', 'Workorder updated successfully!');
+                                }
+                                
+                                public function storeParts(Request $request) {
+                                    // dd($request);
+                                    WorkorderPart::create([
+                                        'workorder_id' => $request->workorder_id,
+                                        'part_id' => $request->part_id,
+                                        'quantity' => $request->quantity,
+                                        'unit_price' => $request->unit_price,
+                                        'us_price' => $request->us_price,
+                                        'exchange_rate' => $request->exchange_rate
+                                    ]);
+                                    
+                                    return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part added successfully!');
+                                }
+                                public function updateParts(Request $request, $wo_part_id) {
+                                    // dd($request);
+                                    WorkorderPart::where('wo_part_id', '=', $wo_part_id)->update([
+                                        'workorder_id' => $request->workorder_id,
+                                        'part_id' => $request->part_id,
+                                        'quantity' => $request->quantity,
+                                        'unit_price' => $request->unit_price,
+                                        'us_price' => $request->us_price,
+                                        'exchange_rate' => $request->exchange_rate
+                                    ]);
+                                    
+                                    return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part updated successfully!');
+                                }
+                                public function destroyParts($wo_part_id) {
+                                    WorkorderPart::where('wo_part_id', '=', $wo_part_id)->delete();
+                                    
+                                    return Redirect::to(URL::previous() . "#step-parts")->with('message', 'Part deleted successfully!');
+                                }
+                                
+                                public function storeLabors(Request $request) {
+                                    // dd($request);
+                                    WorkorderLabor::create([
+                                        'workorder_id' => $request->workorder_id,
+                                        'employee_id' => $request->technician_id,
+                                        'billable_hours' => $request->billable_hours,
+                                        'hourly_rate' => $request->hourly_rate,
+                                        'comments' => $request->comments
+                                    ]);
+                                    
+                                    return Redirect::to(URL::previous() . "#step-labor")->with('message', 'Labor added successfully!');
+                                }
+                                public function updateLabors(Request $request, $wo_labor_id) {
+                                    // dd($request);
+                                    WorkorderLabor::where('wo_labor_id', '=', $wo_labor_id)->update([
+                                        'workorder_id' => $request->workorder_id,
+                                        'employee_id' => $request->technician_id,
+                                        'billable_hours' => $request->billable_hours,
+                                        'hourly_rate' => $request->hourly_rate,
+                                        'comments' => $request->comments
+                                    ]);
+                                    
+                                    return Redirect::to(URL::previous() . "#step-labor")->with('message', 'Labor updated successfully!');
+                                }
+                                public function destroyLabors($wo_labor_id) {
+                                    WorkorderLabor::where('wo_labor_id', '=', $wo_labor_id)->delete();
+                                    
+                                    return Redirect::to(URL::previous() . "#step-labor")->with('message', 'Labor deleted successfully!');
+                                }
+                                
+                                public function storePayments(Request $request) {
+                                    // dd($request);
+                                    Payment::create([
+                                        'workorder_id'      => $request->workorder_id,
+                                        'payment_method_id' => $request->payment_method_id,
+                                        'payment_amount'    => $request->payment_amount,
+                                        'payment_date'      => Carbon::parse($request->payment_date)->format('Y-m-d'),
+                                        'cheque_date'       => Carbon::parse($request->cheque_date)->format('Y-m-d'),
+                                        'bank_name'         => $request->bank_name,
+                                        'cheque_num'        => $request->cheque_num,
+                                        'cheque_amount'     => $request->cheque_amount,
+                                        'received'          => $request->received ? 1 : 0
+                                    ]);
+                                    
+                                    return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment added successfully!');
+                                }
+                                public function updatePayments(Request $request, $payment_id) {
+                                    // dd($request);
+                                    Payment::where('payment_id', '=', $payment_id)->update([
+                                        'workorder_id'      => $request->workorder_id,
+                                        'payment_method_id' => $request->payment_method_id,
+                                        'payment_amount'    => $request->payment_amount,
+                                        'payment_date'      => Carbon::parse($request->payment_date)->format('Y-m-d'),
+                                        'cheque_date'       => Carbon::parse($request->cheque_date)->format('Y-m-d'),
+                                        'bank_name'         => $request->bank_name,
+                                        'cheque_num'        => $request->cheque_num,
+                                        'cheque_amount'     => $request->cheque_amount,
+                                        'received'          => $request->received ? 1 : 0
+                                    ]);
+                                    
+                                    return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment updated successfully!');
+                                }
+                                public function destroyPayments($payment_id) {
+                                    Payment::where('payment_id', '=', $payment_id)->delete();
+                                    
+                                    return Redirect::to(URL::previous() . "#step-payment")->with('message', 'Payment deleted successfully!');
+                                }
+                                
+                                public function workorderInvoice($workorder_id) {
+                                    
+                                    $sql = "select t.workorder_id, t.child_id, t.customer_id, t.employee_id, t.po_num, DATE_FORMAT(t.date_received, '%d/%m/%Y') as date_received, t.report_name, t.serial_num, t.problem_desc, t.country, DATE_FORMAT(t.date_delivered, '%d/%m/%Y') as date_delivered, t.sales_tax_rate, b.name as bname, c.name as cname, t.reference_num from workorder t, customer_parent p, company c, billing_address b where t.workorder_id=$workorder_id and t.customer_id=p.customer_id and p.company_id=c.company_id and p.billing_address_id=b.billing_address_id";
+                                    // dd(count(DB::select($sql)));
+                                    $sub_total = 0;
+                                    $payments = 0;
+                                    $sales_tax = 0;
+                                    $order_total = 0;
+                                    $amount_due = 0;
+                                    $products = 0;
+                                    if(count(DB::select($sql))) {
+
+                                        
+                                        $row = DB::select($sql)[0];
+                                        
+                                        $sql = "select * from customer_parent p, customer_child c where p.customer_id=".$row->customer_id." and p.customer_id=c.customer_id and c.child_id=".$row->child_id;
+                                        $customer = DB::select($sql)[0];
+                                        
+                                        $sql = "select p.name, wp.quantity, wp.us_price, wp.exchange_rate, wp.unit_price from workorder_part wp, part p where wp.workorder_id=$workorder_id and wp.part_id=p.part_id";
+                                        $products = DB::select($sql);
+                                        // dd($products);
+                                        
+                                        $sql = "select sum(p.quantity*p.unit_price) as sub_total from workorder_part p, part pa where p.workorder_id=$workorder_id and p.part_id=pa.part_id";
+                                        $sub_total = DB::select($sql)[0];
+                                        $sub_total = $sub_total->sub_total;
+                                        // dd($sub_total);
+                                        
+                                        $payments = Payment::where([
+                                            ['workorder_id', '=', $workorder_id],
+                                            ['received', '=', 1]
+                                            ])
+                                            ->sum('payment_amount');
+                                    }
+                                        
+                                        $date_delivered = (isset($row) ? $row->date_delivered : '');
+                                        $customer_id = (isset($row) ? $row->customer_id : '');
+                                        $workorder_id = (isset($row) ? $row->workorder_id : '');
+                                        $date_received = (isset($row) ? $row->date_received : '');
+                                        $po_num = (isset($row) ? $row->po_num : '');
+                                        $cname = (isset($row) ? $row->cname : '');
+                                        $report_name = (isset($row) ? $row->report_name : '');
+                                        $problem_desc = (isset($row) ? $row->problem_desc : '');
+                                        $country = (isset($row) ? $row->country : '');
+                                        $reference_num = (isset($row) ? $row->reference_num : '');
+                                        
+                                        $province = (isset($customer) ? $customer->province : '');
+                                        $last_name = (isset($customer) ? $customer->last_name : '');
+                                        $contact_title = (isset($customer) ? $customer->contact_title : '');
+                                        $postal_address = (isset($customer) ? $customer->postal_address : '');
+                                        $city = (isset($customer) ? $customer->city : '');
+                                        $telephone = (isset($customer) ? $customer->telephone : '');
+                                        $extension = (isset($customer) ? $customer->extension : '');
+                                        $direct = (isset($customer) ? $customer->direct : '');
+                                        
+                                        
+                                        $sales_tax_rate = (isset($row) ? $row->sales_tax_rate : '');
+                                        
+                                        if($sub_total > 0) {
+                                            $amount_due = $sub_total - $payments;
+                                            $sales_tax = $sub_total*$sales_tax_rate/100;
+                                            $order_total = $sub_total+$sales_tax;
+                                            $amount_due += $sales_tax;
+                                        }
+                                        
+                                        
+                                        $sub_total = ($sub_total == 0 ? '0' : number_format($sub_total, 0));
+                                        $sales_tax = ($sales_tax == 0 ? '0' : number_format($sales_tax, 0));
+                                        $order_total = ($order_total == 0 ? '0' : number_format($order_total, 0));
+                                        $payments = ($payments == 0 ? '0' : number_format($payments, 0));
+                                        $amount_due = ($amount_due == 0 ? '0' : number_format($amount_due, 0));
+                                        
+                                        return view('reports.invoice', [
+                                            'workorder_id' => $workorder_id,
+                                            'province' => $province,
+                                            'date_delivered' => $date_delivered,
+                                            'last_name' => $last_name,
+                                            'customer_id' => $customer_id,
+                                            'contact_title' => $contact_title,
+                                            'date_received' => $date_received,
+                                            'po_num' => $po_num,
+                                            'cname' => $cname,
+                                            'report_name' => $report_name,
+                                            'postal_address' => $postal_address,
+                                            'city' => $city,
+                                            'problem_desc' => $problem_desc,
+                                            'telephone' => $telephone,
+                                            'extension' => $extension,
+                                            'country' => $country,
+                                            'direct' => $direct,
+                                            'reference_num' => $reference_num,
+                                            
+                                            'products' => $products,
+                                            
+                                            'sub_total' => $sub_total,
+                                            'sales_tax_rate' => $sales_tax_rate,
+                                            'sales_tax' => $sales_tax,
+                                            'order_total' => $order_total,
+                                            'payments' => $payments,
+                                            
+                                        ]);
+                                        
+                                    }
+                                    
+                                    // AJAX Functions
+                                    public function getProduct() {
+                                        $part_id = $_GET['part_id'];
+                                        $part_info = Part::where('part_id', '=', $part_id)->select('unit_price')->get();
+                                        return response()->json(['msg'=> $part_info], 200);
+                                    }
+                                    public function getCompanyAddresses() {
+                                        $wo_company_id = $_GET['wo_company_id'];
+                                        
+                                        $company_billing_addresses = CustomerParent::where('company_id', '=', $wo_company_id)
+                                        ->join('billing_address', 'billing_address.billing_address_id', '=', 'customer_parent.billing_address_id')
+                                        ->select('billing_address.billing_address_id', 'billing_address.name')->get();
+                                        
+                                        return response()->json(['response'=> $company_billing_addresses], 200);
+                                    }
+                                    public function getCompanyPersons() {
                                         $wo_company_id = $_GET['wo_company_id'];
                                         $wo_billing_address_id = $_GET['wo_billing_address_id'];
                                         
-                                        $company_history = CustomerParent::where([
+                                        $company_persons = CustomerParent::where([
                                             ['company_id', '=', $wo_company_id],
                                             ['billing_address_id', '=', $wo_billing_address_id]
                                             ])
-                                            ->join('workorder', 'workorder.customer_id', '=', 'customer_parent.customer_id')
-                                            ->select('workorder.po_num', 'workorder.report_name', DB::raw('DATE_FORMAT(workorder.date_received, "%d-%m-%Y") as date_received'), DB::raw('DATE_FORMAT(workorder.date_delivered, "%d-%m-%Y") as date_delivered'))->get();
+                                            ->join('customer_child', 'customer_child.customer_id', '=', 'customer_parent.customer_id')
+                                            ->select('customer_child.child_id', 'customer_child.first_name', 'customer_child.last_name')->get();
                                             
-                                            $company_name = Company::where('company_id', '=', $wo_company_id)->select('name')->first();
+                                            $postal_address = CustomerParent::where([
+                                                ['company_id', '=', $wo_company_id],
+                                                ['billing_address_id', '=', $wo_billing_address_id]
+                                                ])
+                                                ->select('postal_address')->first();
+                                                
+                                                return response()->json(['response'=> $company_persons, $postal_address], 200);
+                                            }
+                                            public function getCompanyHistory() {
+                                                $wo_company_id = $_GET['wo_company_id'];
+                                                $wo_billing_address_id = $_GET['wo_billing_address_id'];
+                                                
+                                                $company_history = CustomerParent::where([
+                                                    ['company_id', '=', $wo_company_id],
+                                                    ['billing_address_id', '=', $wo_billing_address_id]
+                                                    ])
+                                                    ->join('workorder', 'workorder.customer_id', '=', 'customer_parent.customer_id')
+                                                    ->select('workorder.po_num', 'workorder.report_name', DB::raw('DATE_FORMAT(workorder.date_received, "%d-%m-%Y") as date_received'), DB::raw('DATE_FORMAT(workorder.date_delivered, "%d-%m-%Y") as date_delivered'))->get();
+                                                    
+                                                    $company_name = Company::where('company_id', '=', $wo_company_id)->select('name')->first();
+                                                    
+                                                    return response()->json(array(
+                                                        'response' => $company_history,
+                                                        'company_name' => $company_name
+                                                    ), 200);
+                                                }
+                                                
+                                                public function fileUpload(Request $req){
+                                                    // dd($req);
+                                                    $req->validate([
+                                                        'file' => 'required'
+                                                    ]);
+                                                    $fileModel = new WorkorderFile();
+                                                    if($req->file()) {
+                                                        $fileName = 'report_'.$req->workorder_id.'_'.time().'.'.$req->file->getClientOriginalExtension();
+                                                        $filePath = $req->file('file')->move('woReports', $fileName, 'public');
+                                                        
+                                                        $fileModel->file_name = $fileName;
+                                                        $fileModel->workorder_id = $req->workorder_id;
+                                                        
+                                                        $fileModel->save();
+                                                        return Redirect::to(URL::previous() . "#step-report")
+                                                        ->with('message','File has been uploaded.')
+                                                        ->with('file', $fileName);
+                                                    }
+                                                }
+                                                
+                                            }
                                             
-                                            return response()->json(array(
-                                                'response' => $company_history,
-                                                'company_name' => $company_name
-                                            ), 200);
-                                        }
-
-    public function fileUpload(Request $req){
-        // dd($req);
-        $req->validate([
-        'file' => 'required'
-        ]);
-        $fileModel = new WorkorderFile();
-        if($req->file()) {
-            $fileName = 'report_'.$req->workorder_id.'_'.time().'.'.$req->file->getClientOriginalExtension();
-            $filePath = $req->file('file')->move('woReports', $fileName, 'public');
-        
-            $fileModel->file_name = $fileName;
-            $fileModel->workorder_id = $req->workorder_id;
-
-            $fileModel->save();
-            return Redirect::to(URL::previous() . "#step-report")
-            ->with('message','File has been uploaded.')
-            ->with('file', $fileName);
-        }
-   }
-                                        
-}
-                                    

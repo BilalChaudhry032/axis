@@ -98,6 +98,7 @@ class PaymentController extends Controller
                     return $receivedBtn;
                 })
                 ->addColumn('action', function($row){
+                    $incoive = url('/workorder/'.$row->workorder_id.'/invoice');
                     $actionBtn = '<div class="dropdown-button">
                     <a href="#" class="d-flex align-items-center justify-content-end" data-toggle="dropdown">
                     <div class="menu-icon mr-0">
@@ -107,6 +108,7 @@ class PaymentController extends Controller
                     </div>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
+                    <a href="'.$incoive.'" target="_blank">Invoice</a>
                     <a href="#" class="edit-payment" id="edit_'.$row->payment_id.'">Edit</a>
                     <a href="#" class="delete-payment" id="delete_'.$row->payment_id.'">Delete</a>
                     </div>
