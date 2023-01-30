@@ -12,6 +12,7 @@ use App\Http\Controllers\LayoutController;
 use App\Http\Controllers\PartsController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UsersController;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\UserPermissions;
@@ -131,6 +132,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
         // *** Routes for Workorder UPDATE and related items -End- ***
 
     // *** Routes for Workorders -End- ***
+
+    Route::get('/settings', [SettingsController::class, 'index'])->name('Settings')->middleware([UserPermissions::class]);
 
     Route::get('/reports', [ReportsController::class, 'index'])->name('Reports')->middleware([UserPermissions::class]);
     Route::get('/reports/monthly-sale', [ReportsController::class, 'getMonthlySale']);
