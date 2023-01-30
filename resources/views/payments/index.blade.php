@@ -65,7 +65,7 @@
                   <div class="col-sm-6">
                      <div class="form-group mb-0">
                         <label for="message-text" class="col-form-label">Invoice#</label>
-                        <input type="number" class="form-control invoice_num" required name="workorder_id" id="invoice_num">
+                        <input type="text" class="form-control invoice_num" required name="workorder_id" id="invoice_num">
                      </div>
                   </div>
                   <div class="col-sm-6">

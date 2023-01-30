@@ -410,7 +410,8 @@ class WorkOrderController extends Controller
                                 }
                                 
                                 public function storePayments(Request $request) {
-                                    // dd($request);
+                                    $id_arr = explode(',', $request->workorder_id);
+                                    dd($id_arr);
                                     Payment::create([
                                         'workorder_id'      => $request->workorder_id,
                                         'payment_method_id' => $request->payment_method_id,

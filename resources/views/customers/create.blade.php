@@ -36,7 +36,7 @@
          <label class="font-14 bold mb-3" for="postal_address">Postal Address</label>
         </div>
         <div class="col-sm-9">
-         <textarea id="postal_address" class="theme-input-style style--three" name="postal_address">{{ Session::get('postal_address') }}</textarea>
+         <textarea id="postal_address" class="theme-input-style style--seven" name="postal_address">{{ Session::get('postal_address') }}</textarea>
         </div>
        </div>
        
@@ -82,6 +82,7 @@
            <option value="{{ $com->company_id }}" {{ Session::get('company_id') == $com->company_id ? 'selected' : '' }}>{{ $com->name }}</option>
           @endforeach
          </select>
+         <small>Not in the list? Add <a href="" data-toggle="modal" data-target="#company_create_modal">Company</a></small>
         </div>
        </div>
        
@@ -96,6 +97,7 @@
            <option value="{{ $ba->billing_address_id }}">{{ $ba->name }}</option>
           @endforeach
          </select>
+         <small>Not in the list? Add <a href="" data-toggle="modal" data-target="#billing_address_create_modal">Billing Address</a></small>
         </div>
        </div>
        
@@ -170,9 +172,60 @@
  
 </div>
 
-</div>
+
+<!-- Modal Create Company -->
+<div class="modal fade" id="company_create_modal" tabindex="-1" role="dialog" aria-labelledby="company_create_label" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="company_create_label">Add New Company</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <form action="{{ url('/company') }}" method="POST">
+            @csrf
+            <div class="modal-body">
+               <div class="form-group">
+                  <label for="message-text" class="col-form-label">Company Name</label>
+                  <input class="form-control" required name="name">
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+               <button type="submit" class="btn btn-primary">Add Company</button>
+            </div>
+         </form>
+      </div>
+   </div>
 </div>
 
+<!-- Modal Create Billing Address -->
+<div class="modal fade" id="billing_address_create_modal" tabindex="-1" role="dialog" aria-labelledby="billing_address_create_label" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="billing_address_create_label">Add New Billing Address</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+            </button>
+         </div>
+         <form action="{{ url('/billing-address') }}" method="POST">
+            @csrf
+            <div class="modal-body">
+               <div class="form-group">
+                  <label for="message-text" class="col-form-label">Billing Address</label>
+                  <input class="form-control" required name="name">
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary bg-secondary" data-dismiss="modal">Close</button>
+               <button type="submit" class="btn btn-primary">Add Billing Address</button>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
 
 @endsection
 
