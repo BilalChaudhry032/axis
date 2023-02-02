@@ -417,7 +417,7 @@
                   <h4 class="font-20 mb-2">Parts</h4>
                 </div>
                 <div>
-                  <a href="" data-toggle="modal" data-target="#part_add_modal" type="button" class="btn btn-secondary px-3 py-2">Add Part</a>
+                  <a href="" data-toggle="modal" data-target="#part_add_modal" id="part_add_modal_btn" type="button" class="btn btn-secondary px-3 py-2">Add Part</a>
                 </div>
               </div>
               @if (count($workorder_parts) > 0)
@@ -1030,7 +1030,7 @@
             <div class="col-sm-6">
               <div class="form-group">
                 <label for="message-text" class="col-form-label">Ex. Rate</label>
-                <input class="form-control" type="number" required name="exchange_rate" value="0">
+                <input class="form-control" type="number" required name="exchange_rate" id="exchange_rate" value="0">
               </div>
             </div>
           </div>
@@ -1359,6 +1359,17 @@
       var i = $(this).next('label').clone();
       var file = $('#chooseFile')[0].files[0].name;
       $(this).next('label').text(file);
+    });
+
+    $('#part_add_modal_btn').click(function() {
+      var url = "{{url('/usd-exc-rate')}}";
+      $.ajax({
+        type:'GET',
+        url: url,
+        success:function(data) {
+          $('#exchange_rate').val(data.to_pkr);
+        }
+      });
     });
     
   });

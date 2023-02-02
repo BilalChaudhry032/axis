@@ -134,6 +134,8 @@ Route::middleware([AuthMiddleware::class])->group(function () {
     // *** Routes for Workorders -End- ***
 
     Route::get('/settings', [SettingsController::class, 'index'])->name('Settings')->middleware([UserPermissions::class]);
+        Route::put('/usd-exc-rate', [SettingsController::class, 'updateUsdRate']);
+        Route::get('/usd-exc-rate', [SettingsController::class, 'getUsdRate']);
 
     Route::get('/reports', [ReportsController::class, 'index'])->name('Reports')->middleware([UserPermissions::class]);
     Route::get('/reports/monthly-sale', [ReportsController::class, 'getMonthlySale']);
